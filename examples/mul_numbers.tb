@@ -1,5 +1,5 @@
 # Example of multiplying 2 numbers
-
+#
 push 4 # Push 4 to stack
 push 2 # Push 2 to stack
 mul # Multiply the last 2 numbers in the stack
