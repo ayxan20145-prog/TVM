@@ -16,6 +16,7 @@ enum Instruction {
 struct VM {
     stack: Vec<i32>,
     variables: HashMap<String, i32>,
+    ip: usize,
 }
 
 impl VM {
@@ -23,11 +24,12 @@ impl VM {
         Self {
             stack: Vec::new(),
             variables: HashMap::new(),
+            ip: 0,
         }
     }
     fn execute(&mut self, instructions: &[Instruction]) {
-        for instruction in instructions {
-            match instruction {
+        while self.ip < instructions.len() {
+            match &instructions[self.ip] {
                 Instruction::Push(value) => {
                     self.stack.push(*value);
                 }
@@ -77,6 +79,7 @@ impl VM {
                     println!();
                 }
             }
+            self.ip += 1;
         }
     }
 }
