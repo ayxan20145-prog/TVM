@@ -1,0 +1,5 @@
+# Jump
+#
+push 5 # Push 5 to stack
+print # Print stack
+jump 1 # Jump to 1

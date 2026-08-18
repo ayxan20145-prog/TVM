@@ -9,6 +9,7 @@ enum Instruction {
     Store(String),
     Load(String),
     Drop(String),
+    Jump(usize),
     Print,
     Println,
 }
@@ -72,6 +73,10 @@ impl VM {
                 Instruction::Drop(name) => {
                     self.variables.remove(name);
                 }
+                Instruction::Jump(address) => {
+                    self.ip = *address;
+                    continue;
+                }
                 Instruction::Print => {
                     println!("{:?}", self.stack);
                 }
@@ -130,6 +135,10 @@ fn main() {
             }
             "drop" => {
                 instructions.push(Instruction::Drop(parts[1].to_string()));
+            }
+            "jump" => {
+                let address: usize = parts[1].parse().unwrap();
+                instructions.push(Instruction::Jump(address));
             }
             "print" => {
                 instructions.push(Instruction::Print);
