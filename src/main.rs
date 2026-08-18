@@ -84,6 +84,10 @@ fn main() {
     for line in source.lines() {
         let parts: Vec<&str> = line.split_whitespace().collect();
 
+        if parts.is_empty() || parts[0].starts_with('#') {
+            continue;
+        }
+
         match parts[0] {
             "push" => {
                 let value: i32 = parts[1].parse().unwrap();
@@ -111,9 +115,6 @@ fn main() {
             }
             "prints" => {
                 instructions.push(Instruction::Prints);
-            }
-            "#" => {
-                continue;
             }
             _ => {
                 println!("Unknown instruction: {}", parts[0]);
