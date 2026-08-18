@@ -8,6 +8,7 @@ enum Instruction {
     Div,
     Store(String),
     Load(String),
+    Drop(String),
     Print,
     Println,
 }
@@ -66,6 +67,9 @@ impl VM {
                         println!("Undefined variable: {}", name);
                     }
                 }
+                Instruction::Drop(name) => {
+                    self.variables.remove(name);
+                }
                 Instruction::Print => {
                     println!("{:?}", self.stack);
                 }
@@ -120,6 +124,9 @@ fn main() {
             }
             "load" => {
                 instructions.push(Instruction::Load(parts[1].to_string()));
+            }
+            "drop" => {
+                instructions.push(Instruction::Drop(parts[1].to_string()));
             }
             "print" => {
                 instructions.push(Instruction::Print);
