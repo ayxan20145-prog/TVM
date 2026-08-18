@@ -92,6 +92,9 @@ fn main() {
             "print" => {
                 instructions.push(Instruction::Print);
             }
+            "#" => {
+                continue;
+            }
             _ => {
                 println!("Unknown instruction: {}", parts[0]);
                 return;
