@@ -62,6 +62,8 @@ impl VM {
                 Instruction::Load(name) => {
                     if let Some(variable) = self.variables.iter().find(|v| v.0 == *name) {
                         self.stack.push(variable.1);
+                    } else {
+                        println!("Undefined variable: {}", name);
                     }
                 }
                 Instruction::Print => {
