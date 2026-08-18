@@ -1,4 +1,7 @@
-use std::{env, fs};
+use std::{
+    env, fs,
+    io::{self, Write},
+};
 
 enum Instruction {
     Push(i32),
@@ -6,7 +9,9 @@ enum Instruction {
     Sub,
     Mul,
     Div,
-    Print,
+    Print(i32),
+    Println(i32),
+    Prints,
 }
 
 struct VM {
@@ -47,7 +52,14 @@ impl VM {
 
                     self.stack.push(a / b);
                 }
-                Instruction::Print => {
+                Instruction::Print(value) => {
+                    print!("{}", value);
+                    io::stdout().flush().unwrap();
+                }
+                Instruction::Println(value) => {
+                    println!("{}", value);
+                }
+                Instruction::Prints => {
                     println!("{:?}", self.stack);
                 }
             }
@@ -90,7 +102,15 @@ fn main() {
                 instructions.push(Instruction::Div);
             }
             "print" => {
-                instructions.push(Instruction::Print);
+                let value: i32 = parts[1].parse().unwrap();
+                instructions.push(Instruction::Print(value));
+            }
+            "println" => {
+                let value: i32 = parts[1].parse().unwrap();
+                instructions.push(Instruction::Println(value));
+            }
+            "prints" => {
+                instructions.push(Instruction::Prints);
             }
             "#" => {
                 continue;
