@@ -1,6 +1,9 @@
 enum Instruction {
     Push(i32),
     Add,
+    Sub,
+    Mul,
+    Div,
     Print,
 }
 
@@ -24,6 +27,24 @@ impl VM {
 
                     self.stack.push(a + b);
                 }
+                Instruction::Sub => {
+                    let b = self.stack.pop().unwrap();
+                    let a = self.stack.pop().unwrap();
+
+                    self.stack.push(a - b);
+                }
+                Instruction::Mul => {
+                    let b = self.stack.pop().unwrap();
+                    let a = self.stack.pop().unwrap();
+
+                    self.stack.push(a * b);
+                }
+                Instruction::Div => {
+                    let b = self.stack.pop().unwrap();
+                    let a = self.stack.pop().unwrap();
+
+                    self.stack.push(a / b);
+                }
                 Instruction::Print => {
                     println!("{:?}", self.stack);
                 }
@@ -39,6 +60,8 @@ fn main() {
         Instruction::Push(5),
         Instruction::Push(3),
         Instruction::Add,
+        Instruction::Push(3),
+        Instruction::Sub,
         Instruction::Print,
     ];
 
