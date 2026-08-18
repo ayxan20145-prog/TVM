@@ -1,5 +1,5 @@
-# Print numbers
+# Print
 #
-println 5 # Print 5 with a new line
-print 5 # Print 5
-prints # Print stack
+push 30 # Push 30 to stack
+print # Print stack
+println # Print a new line
