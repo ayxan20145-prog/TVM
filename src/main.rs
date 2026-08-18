@@ -6,17 +6,23 @@ enum Instruction {
     Sub,
     Mul,
     Div,
+    Store(String),
+    Load(String),
     Print,
     Println,
 }
 
 struct VM {
     stack: Vec<i32>,
+    variables: Vec<(String, i32)>,
 }
 
 impl VM {
     fn new() -> Self {
-        Self { stack: Vec::new() }
+        Self {
+            stack: Vec::new(),
+            variables: Vec::new(),
+        }
     }
     fn execute(&mut self, instructions: &[Instruction]) {
         for instruction in instructions {
@@ -47,6 +53,16 @@ impl VM {
                     let a = self.stack.pop().unwrap();
 
                     self.stack.push(a / b);
+                }
+                Instruction::Store(name) => {
+                    let value = self.stack.pop().unwrap();
+
+                    self.variables.push((name.clone(), value));
+                }
+                Instruction::Load(name) => {
+                    if let Some(variable) = self.variables.iter().find(|v| v.0 == *name) {
+                        self.stack.push(variable.1);
+                    }
                 }
                 Instruction::Print => {
                     println!("{:?}", self.stack);
@@ -96,6 +112,12 @@ fn main() {
             }
             "div" => {
                 instructions.push(Instruction::Div);
+            }
+            "store" => {
+                instructions.push(Instruction::Store(parts[1].to_string()));
+            }
+            "load" => {
+                instructions.push(Instruction::Load(parts[1].to_string()));
             }
             "print" => {
                 instructions.push(Instruction::Print);

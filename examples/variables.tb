@@ -1,0 +1,9 @@
+# Variables
+#
+push 45 # Push 45 to stack
+store x # Assign 45 to x
+push 5 # Push 5 to stack
+store y # Assign 5 to y
+load x # Load x to stack
+load y # Load y to stack
+print # Print stack
