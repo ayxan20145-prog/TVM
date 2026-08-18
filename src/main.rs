@@ -1,4 +1,4 @@
-use std::{env, fs};
+use std::{collections::HashMap, env, fs};
 
 enum Instruction {
     Push(i32),
@@ -14,14 +14,14 @@ enum Instruction {
 
 struct VM {
     stack: Vec<i32>,
-    variables: Vec<(String, i32)>,
+    variables: HashMap<String, i32>,
 }
 
 impl VM {
     fn new() -> Self {
         Self {
             stack: Vec::new(),
-            variables: Vec::new(),
+            variables: HashMap::new(),
         }
     }
     fn execute(&mut self, instructions: &[Instruction]) {
@@ -57,11 +57,11 @@ impl VM {
                 Instruction::Store(name) => {
                     let value = self.stack.pop().unwrap();
 
-                    self.variables.push((name.clone(), value));
+                    self.variables.insert(name.clone(), value);
                 }
                 Instruction::Load(name) => {
-                    if let Some(variable) = self.variables.iter().find(|v| v.0 == *name) {
-                        self.stack.push(variable.1);
+                    if let Some(&value) = self.variables.get(name) {
+                        self.stack.push(value);
                     } else {
                         println!("Undefined variable: {}", name);
                     }
