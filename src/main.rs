@@ -2,6 +2,7 @@ use std::{collections::HashMap, env, fs};
 
 enum Instruction {
     Push(i32),
+    Pop,
     Add,
     Sub,
     Mul,
@@ -33,6 +34,9 @@ impl VM {
             match &instructions[self.ip] {
                 Instruction::Push(value) => {
                     self.stack.push(*value);
+                }
+                Instruction::Pop => {
+                    self.stack.pop().unwrap();
                 }
                 Instruction::Add => {
                     let b = self.stack.pop().unwrap();
@@ -114,6 +118,9 @@ fn main() {
             "push" => {
                 let value: i32 = parts[1].parse().unwrap();
                 instructions.push(Instruction::Push(value));
+            }
+            "pop" => {
+                instructions.push(Instruction::Pop);
             }
             "add" => {
                 instructions.push(Instruction::Add);
