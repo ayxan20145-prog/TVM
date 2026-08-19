@@ -2,6 +2,7 @@ use std::{collections::HashMap, env, fmt, fs};
 
 enum Instruction {
     Push(Value),
+    PushStr(String),
     Pop,
     Add,
     Sub,
@@ -16,10 +17,11 @@ enum Instruction {
     Exit,
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone)]
 enum Value {
     Int(i32),
     Float(f64),
+    String(String),
 }
 
 impl fmt::Display for Value {
@@ -27,6 +29,7 @@ impl fmt::Display for Value {
         match self {
             Value::Int(value) => write!(f, "{}", value),
             Value::Float(value) => write!(f, "{}", value),
+            Value::String(value) => write!(f, "{}", value),
         }
     }
 }
@@ -49,7 +52,10 @@ impl VM {
         while self.ip < instructions.len() {
             match &instructions[self.ip] {
                 Instruction::Push(value) => {
-                    self.stack.push(*value);
+                    self.stack.push(value.clone());
+                }
+                Instruction::PushStr(value) => {
+                    self.stack.push(Value::String(value.clone()));
                 }
                 Instruction::Pop => {
                     self.stack.pop().unwrap();
@@ -58,14 +64,20 @@ impl VM {
                     let b = self.stack.pop().unwrap();
                     let a = self.stack.pop().unwrap();
 
-                    let result = match (a, b) {
+                    let result = match (&a, &b) {
                         (Value::Int(a), Value::Int(b)) => Value::Int(a + b),
 
                         (Value::Float(a), Value::Float(b)) => Value::Float(a + b),
 
-                        (Value::Int(a), Value::Float(b)) => Value::Float(a as f64 + b),
+                        (Value::Int(a), Value::Float(b)) => Value::Float(*a as f64 + b),
 
-                        (Value::Float(a), Value::Int(b)) => Value::Float(a + b as f64),
+                        (Value::Float(a), Value::Int(b)) => Value::Float(a + *b as f64),
+
+                        (Value::String(a), Value::String(b)) => {
+                            Value::String(format!("{}{}", a, b))
+                        }
+
+                        _ => panic!("Cant add: {} and {}", a, b),
                     };
 
                     self.stack.push(result);
@@ -74,14 +86,18 @@ impl VM {
                     let b = self.stack.pop().unwrap();
                     let a = self.stack.pop().unwrap();
 
-                    let result = match (a, b) {
+                    let result = match (&a, &b) {
                         (Value::Int(a), Value::Int(b)) => Value::Int(a - b),
 
                         (Value::Float(a), Value::Float(b)) => Value::Float(a - b),
 
-                        (Value::Int(a), Value::Float(b)) => Value::Float(a as f64 - b),
+                        (Value::Int(a), Value::Float(b)) => Value::Float(*a as f64 - b),
 
-                        (Value::Float(a), Value::Int(b)) => Value::Float(a - b as f64),
+                        (Value::Float(a), Value::Int(b)) => Value::Float(a - *b as f64),
+
+                        (Value::String(a), Value::String(b)) => Value::String(a.replace(b, "")),
+
+                        _ => panic!("Cant sub: {} and {}", a, b),
                     };
 
                     self.stack.push(result);
@@ -90,14 +106,16 @@ impl VM {
                     let b = self.stack.pop().unwrap();
                     let a = self.stack.pop().unwrap();
 
-                    let result = match (a, b) {
+                    let result = match (&a, &b) {
                         (Value::Int(a), Value::Int(b)) => Value::Int(a * b),
 
                         (Value::Float(a), Value::Float(b)) => Value::Float(a * b),
 
-                        (Value::Int(a), Value::Float(b)) => Value::Float(a as f64 * b),
+                        (Value::Int(a), Value::Float(b)) => Value::Float(*a as f64 * b),
 
-                        (Value::Float(a), Value::Int(b)) => Value::Float(a * b as f64),
+                        (Value::Float(a), Value::Int(b)) => Value::Float(a * *b as f64),
+
+                        _ => panic!("Cant mul: {} and {}", a, b),
                     };
 
                     self.stack.push(result);
@@ -106,14 +124,16 @@ impl VM {
                     let b = self.stack.pop().unwrap();
                     let a = self.stack.pop().unwrap();
 
-                    let result = match (a, b) {
+                    let result = match (&a, &b) {
                         (Value::Int(a), Value::Int(b)) => Value::Int(a / b),
 
                         (Value::Float(a), Value::Float(b)) => Value::Float(a / b),
 
-                        (Value::Int(a), Value::Float(b)) => Value::Float(a as f64 / b),
+                        (Value::Int(a), Value::Float(b)) => Value::Float(*a as f64 / b),
 
-                        (Value::Float(a), Value::Int(b)) => Value::Float(a / b as f64),
+                        (Value::Float(a), Value::Int(b)) => Value::Float(a / *b as f64),
+
+                        _ => panic!("Cant div: {} and {}", a, b),
                     };
 
                     self.stack.push(result);
@@ -124,8 +144,8 @@ impl VM {
                     self.variables.insert(name.clone(), value);
                 }
                 Instruction::Load(name) => {
-                    if let Some(&value) = self.variables.get(name) {
-                        self.stack.push(value);
+                    if let Some(value) = self.variables.get(name) {
+                        self.stack.push(value.clone());
                     } else {
                         panic!("Undefined variable: {}", name);
                     }
@@ -182,6 +202,9 @@ fn main() {
                 };
 
                 instructions.push(Instruction::Push(value));
+            }
+            "pushstr" => {
+                instructions.push(Instruction::PushStr(parts[1].to_string()));
             }
             "pop" => {
                 instructions.push(Instruction::Pop);
