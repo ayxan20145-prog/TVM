@@ -1,4 +1,4 @@
-use std::{collections::HashMap, env, fmt, fs};
+use std::{collections::HashMap, env, fmt, fs, io};
 
 enum Instruction {
     Push(Value),
@@ -15,6 +15,7 @@ enum Instruction {
     Jump(usize),
     Print,
     Println,
+    Read(ReadType),
     Exit,
 }
 
@@ -23,6 +24,12 @@ enum Value {
     Int(i32),
     Float(f64),
     String(String),
+}
+
+enum ReadType {
+    Int,
+    Float,
+    String,
 }
 
 impl fmt::Display for Value {
@@ -167,6 +174,46 @@ impl VM {
                 Instruction::Println => {
                     println!();
                 }
+                Instruction::Read(value) => match value {
+                    ReadType::Int => {
+                        let mut input = String::new();
+                        io::stdin()
+                            .read_line(&mut input)
+                            .expect("Failed to read line");
+
+                        let input: i32 = match input.trim().parse() {
+                            Ok(e) => e,
+                            Err(e) => {
+                                println!("Error: {}", e);
+                                break;
+                            }
+                        };
+                        self.stack.push(Value::Int(input));
+                    }
+                    ReadType::Float => {
+                        let mut input = String::new();
+                        io::stdin()
+                            .read_line(&mut input)
+                            .expect("Failed to read line");
+
+                        let input: f64 = match input.trim().parse() {
+                            Ok(e) => e,
+                            Err(e) => {
+                                println!("Error: {}", e);
+                                break;
+                            }
+                        };
+                        self.stack.push(Value::Float(input));
+                    }
+                    ReadType::String => {
+                        let mut input = String::new();
+                        io::stdin()
+                            .read_line(&mut input)
+                            .expect("Failed to read line");
+
+                        self.stack.push(Value::String(input.trim().to_string()));
+                    }
+                },
                 Instruction::Exit => {
                     break;
                 }
@@ -246,6 +293,17 @@ fn main() {
             }
             "println" => {
                 instructions.push(Instruction::Println);
+            }
+            "read" => {
+                match parts[1] {
+                    "int" => instructions.push(Instruction::Read(ReadType::Int)),
+                    "float" => instructions.push(Instruction::Read(ReadType::Float)),
+                    "string" => instructions.push(Instruction::Read(ReadType::String)),
+                    _ => {
+                        println!("Unknown type");
+                        break;
+                    }
+                };
             }
             "exit" => {
                 instructions.push(Instruction::Exit);
