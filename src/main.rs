@@ -19,7 +19,7 @@ enum Instruction {
     Exit,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 enum Value {
     Int(i32),
     Float(f64),
@@ -30,6 +30,18 @@ enum ReadType {
     Int,
     Float,
     String,
+}
+
+#[derive(Debug)]
+enum VmError {
+    StackUnderflow,
+    TypeMismatch {
+        operation: String,
+        left: Value,
+        right: Value,
+    },
+    UndefinedVariable(String),
+    DivisionByZero,
 }
 
 impl fmt::Display for Value {
@@ -56,7 +68,10 @@ impl VM {
             ip: 0,
         }
     }
-    fn execute(&mut self, instructions: &[Instruction]) {
+    fn pop(&mut self) -> Result<Value, VmError> {
+        self.stack.pop().ok_or(VmError::StackUnderflow)
+    }
+    fn execute(&mut self, instructions: &[Instruction]) -> Result<(), VmError> {
         while self.ip < instructions.len() {
             match &instructions[self.ip] {
                 Instruction::Push(value) => {
@@ -69,11 +84,11 @@ impl VM {
                     self.stack.push(Value::String(String::from(" ")));
                 }
                 Instruction::Pop => {
-                    self.stack.pop().unwrap();
+                    self.pop()?;
                 }
                 Instruction::Add => {
-                    let b = self.stack.pop().unwrap();
-                    let a = self.stack.pop().unwrap();
+                    let b = self.pop()?;
+                    let a = self.pop()?;
 
                     let result = match (&a, &b) {
                         (Value::Int(a), Value::Int(b)) => Value::Int(a + b),
@@ -88,14 +103,20 @@ impl VM {
                             Value::String(format!("{}{}", a, b))
                         }
 
-                        _ => panic!("Cant add: {} and {}", a, b),
+                        _ => {
+                            return Err(VmError::TypeMismatch {
+                                operation: String::from("add"),
+                                left: a,
+                                right: b,
+                            });
+                        }
                     };
 
                     self.stack.push(result);
                 }
                 Instruction::Sub => {
-                    let b = self.stack.pop().unwrap();
-                    let a = self.stack.pop().unwrap();
+                    let b = self.pop()?;
+                    let a = self.pop()?;
 
                     let result = match (&a, &b) {
                         (Value::Int(a), Value::Int(b)) => Value::Int(a - b),
@@ -108,14 +129,20 @@ impl VM {
 
                         (Value::String(a), Value::String(b)) => Value::String(a.replace(b, "")),
 
-                        _ => panic!("Cant sub: {} and {}", a, b),
+                        _ => {
+                            return Err(VmError::TypeMismatch {
+                                operation: String::from("sub"),
+                                left: a,
+                                right: b,
+                            });
+                        }
                     };
 
                     self.stack.push(result);
                 }
                 Instruction::Mul => {
-                    let b = self.stack.pop().unwrap();
-                    let a = self.stack.pop().unwrap();
+                    let b = self.pop()?;
+                    let a = self.pop()?;
 
                     let result = match (&a, &b) {
                         (Value::Int(a), Value::Int(b)) => Value::Int(a * b),
@@ -126,40 +153,76 @@ impl VM {
 
                         (Value::Float(a), Value::Int(b)) => Value::Float(a * *b as f64),
 
-                        _ => panic!("Cant mul: {} and {}", a, b),
+                        _ => {
+                            return Err(VmError::TypeMismatch {
+                                operation: String::from("mul"),
+                                left: a,
+                                right: b,
+                            });
+                        }
                     };
 
                     self.stack.push(result);
                 }
                 Instruction::Div => {
-                    let b = self.stack.pop().unwrap();
-                    let a = self.stack.pop().unwrap();
+                    let b = self.pop()?;
+                    let a = self.pop()?;
 
                     let result = match (&a, &b) {
-                        (Value::Int(a), Value::Int(b)) => Value::Int(a / b),
+                        (Value::Int(a), Value::Int(b)) => {
+                            if *b == 0 {
+                                return Err(VmError::DivisionByZero);
+                            }
 
-                        (Value::Float(a), Value::Float(b)) => Value::Float(a / b),
+                            Value::Int(a / b)
+                        }
 
-                        (Value::Int(a), Value::Float(b)) => Value::Float(*a as f64 / b),
+                        (Value::Float(a), Value::Float(b)) => {
+                            if *b == 0.0 {
+                                return Err(VmError::DivisionByZero);
+                            }
 
-                        (Value::Float(a), Value::Int(b)) => Value::Float(a / *b as f64),
+                            Value::Float(a / b)
+                        }
 
-                        _ => panic!("Cant div: {} and {}", a, b),
+                        (Value::Int(a), Value::Float(b)) => {
+                            if *b == 0.0 {
+                                return Err(VmError::DivisionByZero);
+                            }
+                            Value::Float(*a as f64 / b)
+                        }
+
+                        (Value::Float(a), Value::Int(b)) => {
+                            if *b == 0 {
+                                return Err(VmError::DivisionByZero);
+                            }
+
+                            Value::Float(a / *b as f64)
+                        }
+
+                        _ => {
+                            return Err(VmError::TypeMismatch {
+                                operation: String::from("div"),
+                                left: a,
+                                right: b,
+                            });
+                        }
                     };
 
                     self.stack.push(result);
                 }
                 Instruction::Store(name) => {
-                    let value = self.stack.pop().unwrap();
+                    let value = self.pop()?;
 
                     self.variables.insert(name.clone(), value);
                 }
                 Instruction::Load(name) => {
-                    if let Some(value) = self.variables.get(name) {
-                        self.stack.push(value.clone());
-                    } else {
-                        panic!("Undefined variable: {}", name);
-                    }
+                    let value = self
+                        .variables
+                        .get(name)
+                        .ok_or_else(|| VmError::UndefinedVariable(name.clone()))?;
+
+                    self.stack.push(value.clone());
                 }
                 Instruction::Drop(name) => {
                     self.variables.remove(name);
@@ -169,7 +232,7 @@ impl VM {
                     continue;
                 }
                 Instruction::Print => {
-                    print!("{}", self.stack.pop().unwrap());
+                    print!("{}", self.pop()?);
                 }
                 Instruction::Println => {
                     println!();
@@ -220,6 +283,7 @@ impl VM {
             }
             self.ip += 1;
         }
+        Ok(())
     }
 }
 
@@ -315,5 +379,7 @@ fn main() {
         }
     }
 
-    vm.execute(instructions.as_slice());
+    if let Err(error) = vm.execute(&instructions) {
+        eprintln!("VM error: {:?}", error);
+    }
 }
