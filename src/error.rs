@@ -18,6 +18,10 @@ pub enum VmError {
     DivisionByZero {
         ip: usize,
     },
+    InvalidInput {
+        input: String,
+        ip: usize,
+    },
 }
 
 pub enum ParseError {
@@ -54,6 +58,10 @@ impl fmt::Display for VmError {
 
             VmError::DivisionByZero { ip } => {
                 write!(f, "division by zero at instruction {}", ip)
+            }
+
+            VmError::InvalidInput { input, ip } => {
+                write!(f, "invalid input at instruction {}: {}", ip, input)
             }
         }
     }
