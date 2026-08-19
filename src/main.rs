@@ -3,6 +3,7 @@ use std::{collections::HashMap, env, fmt, fs};
 enum Instruction {
     Push(Value),
     PushStr(String),
+    PushSpace,
     Pop,
     Add,
     Sub,
@@ -56,6 +57,9 @@ impl VM {
                 }
                 Instruction::PushStr(value) => {
                     self.stack.push(Value::String(value.clone()));
+                }
+                Instruction::PushSpace => {
+                    self.stack.push(Value::String(String::from(" ")));
                 }
                 Instruction::Pop => {
                     self.stack.pop().unwrap();
@@ -205,6 +209,9 @@ fn main() {
             }
             "pushstr" => {
                 instructions.push(Instruction::PushStr(parts[1].to_string()));
+            }
+            "pushspace" => {
+                instructions.push(Instruction::PushSpace);
             }
             "pop" => {
                 instructions.push(Instruction::Pop);

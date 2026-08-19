@@ -1,0 +1,9 @@
+# Strings
+#
+pushstr Hello # Push "hello" to stack
+pushspace # Push " " to stack
+add # Add the last 2 values in stack
+pushstr World! # Push "World!" to stack
+add # Add the last 2 values in stack
+print # Print top value in stack
+println # Print a new line
