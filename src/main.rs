@@ -101,6 +101,32 @@ impl fmt::Display for VmError {
     }
 }
 
+impl fmt::Display for ParseError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            ParseError::UnknownInstruction { instruction, line } => {
+                write!(f, "unknown instruction at line {}: {}", line, instruction)
+            }
+
+            ParseError::MissingArgument { instruction, line } => {
+                write!(f, "missing argument at line {}: {}", line, instruction)
+            }
+
+            ParseError::UnexpectedArgument { instruction, line } => {
+                write!(f, "unexpected argument at line {}: {}", line, instruction)
+            }
+
+            ParseError::InvalidReadType { value, line } => {
+                write!(f, "invalid read type at line {}: {}", line, value)
+            }
+
+            ParseError::InvalidNumber { value, line } => {
+                write!(f, "invalid number at line {}: {}", line, value)
+            }
+        }
+    }
+}
+
 struct VM {
     stack: Vec<Value>,
     variables: HashMap<String, Value>,
@@ -358,7 +384,7 @@ fn main() {
     let instructions = match parse(&source) {
         Ok(instructions) => instructions,
         Err(e) => {
-            eprintln!("Parse error: {:?}", e);
+            eprintln!("Parse error: {}", e);
             return;
         }
     };
