@@ -33,14 +33,22 @@ enum ReadType {
 }
 
 enum VmError {
-    StackUnderflow,
+    StackUnderflow {
+        ip: usize,
+    },
     TypeMismatch {
         operation: String,
         left: Value,
         right: Value,
+        ip: usize,
     },
-    UndefinedVariable(String),
-    DivisionByZero,
+    UndefinedVariable {
+        name: String,
+        ip: usize,
+    },
+    DivisionByZero {
+        ip: usize,
+    },
 }
 
 impl fmt::Display for Value {
@@ -56,24 +64,29 @@ impl fmt::Display for Value {
 impl fmt::Display for VmError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            VmError::StackUnderflow => {
-                write!(f, "stack underflow")
+            VmError::StackUnderflow { ip } => {
+                write!(f, "stack underflow at {}", ip)
             }
 
             VmError::TypeMismatch {
                 operation,
                 left,
                 right,
+                ip,
             } => {
-                write!(f, "cannot {} {} and {}", operation, left, right)
+                write!(
+                    f,
+                    "type mismatch at {}: cannot {} {} and {}",
+                    ip, operation, left, right
+                )
             }
 
-            VmError::UndefinedVariable(name) => {
-                write!(f, "undefined variable: {}", name)
+            VmError::UndefinedVariable { name, ip } => {
+                write!(f, "undefined variable at {}: {}", ip, name)
             }
 
-            VmError::DivisionByZero => {
-                write!(f, "division by zero")
+            VmError::DivisionByZero { ip } => {
+                write!(f, "division by zero at {}", ip)
             }
         }
     }
@@ -94,7 +107,9 @@ impl VM {
         }
     }
     fn pop(&mut self) -> Result<Value, VmError> {
-        self.stack.pop().ok_or(VmError::StackUnderflow)
+        self.stack
+            .pop()
+            .ok_or(VmError::StackUnderflow { ip: self.ip })
     }
     fn execute(&mut self, instructions: &[Instruction]) -> Result<(), VmError> {
         while self.ip < instructions.len() {
@@ -133,6 +148,7 @@ impl VM {
                                 operation: String::from("add"),
                                 left: a,
                                 right: b,
+                                ip: self.ip,
                             });
                         }
                     };
@@ -159,6 +175,7 @@ impl VM {
                                 operation: String::from("sub"),
                                 left: a,
                                 right: b,
+                                ip: self.ip,
                             });
                         }
                     };
@@ -183,6 +200,7 @@ impl VM {
                                 operation: String::from("mul"),
                                 left: a,
                                 right: b,
+                                ip: self.ip,
                             });
                         }
                     };
@@ -196,7 +214,7 @@ impl VM {
                     let result = match (&a, &b) {
                         (Value::Int(a), Value::Int(b)) => {
                             if *b == 0 {
-                                return Err(VmError::DivisionByZero);
+                                return Err(VmError::DivisionByZero { ip: self.ip });
                             }
 
                             Value::Int(a / b)
@@ -204,7 +222,7 @@ impl VM {
 
                         (Value::Float(a), Value::Float(b)) => {
                             if *b == 0.0 {
-                                return Err(VmError::DivisionByZero);
+                                return Err(VmError::DivisionByZero { ip: self.ip });
                             }
 
                             Value::Float(a / b)
@@ -212,14 +230,14 @@ impl VM {
 
                         (Value::Int(a), Value::Float(b)) => {
                             if *b == 0.0 {
-                                return Err(VmError::DivisionByZero);
+                                return Err(VmError::DivisionByZero { ip: self.ip });
                             }
                             Value::Float(*a as f64 / b)
                         }
 
                         (Value::Float(a), Value::Int(b)) => {
                             if *b == 0 {
-                                return Err(VmError::DivisionByZero);
+                                return Err(VmError::DivisionByZero { ip: self.ip });
                             }
 
                             Value::Float(a / *b as f64)
@@ -230,6 +248,7 @@ impl VM {
                                 operation: String::from("div"),
                                 left: a,
                                 right: b,
+                                ip: self.ip,
                             });
                         }
                     };
@@ -242,10 +261,13 @@ impl VM {
                     self.variables.insert(name.clone(), value);
                 }
                 Instruction::Load(name) => {
-                    let value = self
-                        .variables
-                        .get(name)
-                        .ok_or_else(|| VmError::UndefinedVariable(name.clone()))?;
+                    let value =
+                        self.variables
+                            .get(name)
+                            .ok_or_else(|| VmError::UndefinedVariable {
+                                name: name.clone(),
+                                ip: self.ip,
+                            })?;
 
                     self.stack.push(value.clone());
                 }
