@@ -32,7 +32,6 @@ enum ReadType {
     String,
 }
 
-#[derive(Debug)]
 enum VmError {
     StackUnderflow,
     TypeMismatch {
@@ -50,6 +49,32 @@ impl fmt::Display for Value {
             Value::Int(value) => write!(f, "{}", value),
             Value::Float(value) => write!(f, "{}", value),
             Value::String(value) => write!(f, "{}", value),
+        }
+    }
+}
+
+impl fmt::Display for VmError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            VmError::StackUnderflow => {
+                write!(f, "stack underflow")
+            }
+
+            VmError::TypeMismatch {
+                operation,
+                left,
+                right,
+            } => {
+                write!(f, "cannot {} {} and {}", operation, left, right)
+            }
+
+            VmError::UndefinedVariable(name) => {
+                write!(f, "undefined variable: {}", name)
+            }
+
+            VmError::DivisionByZero => {
+                write!(f, "division by zero")
+            }
         }
     }
 }
@@ -380,6 +405,6 @@ fn main() {
     }
 
     if let Err(error) = vm.execute(&instructions) {
-        eprintln!("VM error: {:?}", error);
+        eprintln!("VM error: {}", error);
     }
 }
