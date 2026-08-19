@@ -408,19 +408,7 @@ fn parse(source: &str) -> Result<Vec<Instruction>, ParseError> {
 
         match parts[0] {
             "push" => {
-                if parts.len() < 2 {
-                    return Err(ParseError::MissingArgument {
-                        instruction: String::from("push"),
-                        line: line_number,
-                    });
-                }
-
-                if parts.len() > 2 {
-                    return Err(ParseError::UnexpectedArgument {
-                        instruction: String::from("push"),
-                        line: line_number,
-                    });
-                }
+                check_args(&parts, 1, "push", line_number)?;
 
                 let value = if parts[1].contains('.') {
                     match parts[1].parse::<f64>() {
@@ -447,12 +435,7 @@ fn parse(source: &str) -> Result<Vec<Instruction>, ParseError> {
                 instructions.push(Instruction::Push(value));
             }
             "pushstr" => {
-                if parts.len() < 2 {
-                    return Err(ParseError::MissingArgument {
-                        instruction: String::from("pushstr"),
-                        line: line_number,
-                    });
-                }
+                check_args(&parts, 1, "pushstr", line_number)?;
 
                 instructions.push(Instruction::PushStr(parts[1].to_string()));
             }
@@ -475,42 +458,22 @@ fn parse(source: &str) -> Result<Vec<Instruction>, ParseError> {
                 instructions.push(Instruction::Div);
             }
             "store" => {
-                if parts.len() < 2 {
-                    return Err(ParseError::MissingArgument {
-                        instruction: String::from("store"),
-                        line: line_number,
-                    });
-                }
+                check_args(&parts, 1, "store", line_number)?;
 
                 instructions.push(Instruction::Store(parts[1].to_string()));
             }
             "load" => {
-                if parts.len() < 2 {
-                    return Err(ParseError::MissingArgument {
-                        instruction: String::from("load"),
-                        line: line_number,
-                    });
-                }
+                check_args(&parts, 1, "load", line_number)?;
 
                 instructions.push(Instruction::Load(parts[1].to_string()));
             }
             "drop" => {
-                if parts.len() < 2 {
-                    return Err(ParseError::MissingArgument {
-                        instruction: String::from("drop"),
-                        line: line_number,
-                    });
-                }
+                check_args(&parts, 1, "drop", line_number)?;
 
                 instructions.push(Instruction::Drop(parts[1].to_string()));
             }
             "jump" => {
-                if parts.len() < 2 {
-                    return Err(ParseError::MissingArgument {
-                        instruction: String::from("jump"),
-                        line: line_number,
-                    });
-                }
+                check_args(&parts, 1, "jump", line_number)?;
 
                 let address = match parts[1].parse::<usize>() {
                     Ok(address) => address,
@@ -531,12 +494,7 @@ fn parse(source: &str) -> Result<Vec<Instruction>, ParseError> {
                 instructions.push(Instruction::Println);
             }
             "read" => {
-                if parts.len() < 2 {
-                    return Err(ParseError::MissingArgument {
-                        instruction: String::from("read"),
-                        line: line_number,
-                    });
-                }
+                check_args(&parts, 1, "read", line_number)?;
 
                 match parts[1] {
                     "int" => instructions.push(Instruction::Read(ReadType::Int)),
@@ -562,4 +520,28 @@ fn parse(source: &str) -> Result<Vec<Instruction>, ParseError> {
         }
     }
     Ok(instructions)
+}
+fn check_args(
+    parts: &[&str],
+    expected: usize,
+    instruction: &str,
+    line: usize,
+) -> Result<(), ParseError> {
+    let args = parts.len() - 1;
+
+    if args < expected {
+        return Err(ParseError::MissingArgument {
+            instruction: String::from(instruction),
+            line,
+        });
+    }
+
+    if args > expected {
+        return Err(ParseError::UnexpectedArgument {
+            instruction: String::from(instruction),
+            line,
+        });
+    }
+
+    Ok(())
 }
