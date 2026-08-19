@@ -440,21 +440,32 @@ fn parse(source: &str) -> Result<Vec<Instruction>, ParseError> {
                 instructions.push(Instruction::PushStr(parts[1].to_string()));
             }
             "pushspace" => {
+                check_args(&parts, 0, "pushspace", line_number)?;
                 instructions.push(Instruction::PushSpace);
             }
             "pop" => {
+                check_args(&parts, 0, "pop", line_number)?;
+
                 instructions.push(Instruction::Pop);
             }
             "add" => {
+                check_args(&parts, 0, "add", line_number)?;
+
                 instructions.push(Instruction::Add);
             }
             "sub" => {
+                check_args(&parts, 0, "sub", line_number)?;
+
                 instructions.push(Instruction::Sub);
             }
             "mul" => {
+                check_args(&parts, 0, "mul", line_number)?;
+
                 instructions.push(Instruction::Mul);
             }
             "div" => {
+                check_args(&parts, 0, "div", line_number)?;
+
                 instructions.push(Instruction::Div);
             }
             "store" => {
@@ -488,9 +499,13 @@ fn parse(source: &str) -> Result<Vec<Instruction>, ParseError> {
                 instructions.push(Instruction::Jump(address));
             }
             "print" => {
+                check_args(&parts, 0, "print", line_number)?;
+
                 instructions.push(Instruction::Print);
             }
             "println" => {
+                check_args(&parts, 0, "println", line_number)?;
+
                 instructions.push(Instruction::Println);
             }
             "read" => {
@@ -509,6 +524,8 @@ fn parse(source: &str) -> Result<Vec<Instruction>, ParseError> {
                 };
             }
             "exit" => {
+                check_args(&parts, 0, "exit", line_number)?;
+
                 instructions.push(Instruction::Exit);
             }
             instruction => {
@@ -527,7 +544,7 @@ fn check_args(
     instruction: &str,
     line: usize,
 ) -> Result<(), ParseError> {
-    let args = parts.len() - 1;
+    let args = parts.len().saturating_sub(1);
 
     if args < expected {
         return Err(ParseError::MissingArgument {
