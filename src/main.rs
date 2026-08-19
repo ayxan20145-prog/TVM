@@ -13,6 +13,7 @@ enum Instruction {
     Jump(usize),
     Print,
     Println,
+    Exit,
 }
 
 struct VM {
@@ -87,6 +88,9 @@ impl VM {
                 Instruction::Println => {
                     println!();
                 }
+                Instruction::Exit => {
+                    break;
+                }
             }
             self.ip += 1;
         }
@@ -152,6 +156,9 @@ fn main() {
             }
             "println" => {
                 instructions.push(Instruction::Println);
+            }
+            "exit" => {
+                instructions.push(Instruction::Exit);
             }
             _ => {
                 println!("Unknown instruction: {}", parts[0]);
