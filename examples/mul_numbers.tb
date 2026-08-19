@@ -3,4 +3,5 @@
 push 4 # Push 4 to stack
 push 2 # Push 2 to stack
 mul # Multiply the last 2 numbers in the stack
-print # Print stack
+print # Print top value in stack
+println # Print a new line

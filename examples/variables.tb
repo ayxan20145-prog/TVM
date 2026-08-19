@@ -6,7 +6,10 @@ push 5 # Push 5 to stack
 store y # Assign 5 to y
 load x # Load x to stack
 load y # Load y to stack
-print # Print stack
-push 10 # Push 5 to stack
+print # Print top value in stack
+println # Print a value
+print # Print top value in stack
+println # Print a new line
+push 10 # Push 10 to stack
 drop x # Drop x
 drop y # Drop y

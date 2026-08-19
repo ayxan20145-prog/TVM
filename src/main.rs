@@ -1,4 +1,4 @@
-use std::{collections::HashMap, env, fs};
+use std::{collections::HashMap, env, fmt, fs};
 
 enum Instruction {
     Push(Value),
@@ -16,10 +16,19 @@ enum Instruction {
     Exit,
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Clone, Copy)]
 enum Value {
     Int(i32),
     Float(f64),
+}
+
+impl fmt::Display for Value {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Value::Int(value) => write!(f, "{}", value),
+            Value::Float(value) => write!(f, "{}", value),
+        }
+    }
 }
 
 struct VM {
@@ -129,7 +138,7 @@ impl VM {
                     continue;
                 }
                 Instruction::Print => {
-                    println!("{:?}", self.stack.pop().unwrap());
+                    print!("{}", self.stack.pop().unwrap());
                 }
                 Instruction::Println => {
                     println!();

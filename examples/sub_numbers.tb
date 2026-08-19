@@ -3,4 +3,5 @@
 push 4 # Push 4 to stack
 push 2 # Push 2 to stack
 sub # Subtract last 2 numbers in stack
-print # Print stack
+print # Print top value in stack
+println # Print a new line

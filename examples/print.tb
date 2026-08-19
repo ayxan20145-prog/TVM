@@ -1,5 +1,5 @@
 # Print
 #
 push 30 # Push 30 to stack
-print # Print stack
+print # Print top value in stack
 println # Print a new line
