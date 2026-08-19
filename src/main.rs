@@ -51,6 +51,15 @@ enum VmError {
     },
 }
 
+#[derive(Debug)]
+enum ParseError {
+    UnknownInstruction { instruction: String, line: usize },
+    MissingArgument { instruction: String, line: usize },
+    UnexpectedArgument { instruction: String, line: usize },
+    InvalidReadType { value: String, line: usize },
+    InvalidNumber { value: String, line: usize },
+}
+
 impl fmt::Display for Value {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
@@ -65,7 +74,7 @@ impl fmt::Display for VmError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             VmError::StackUnderflow { ip } => {
-                write!(f, "stack underflow at {}", ip)
+                write!(f, "stack underflow at instruction {}", ip)
             }
 
             VmError::TypeMismatch {
@@ -76,17 +85,17 @@ impl fmt::Display for VmError {
             } => {
                 write!(
                     f,
-                    "type mismatch at {}: cannot {} {} and {}",
+                    "type mismatch at instruction {}: cannot {} {} and {}",
                     ip, operation, left, right
                 )
             }
 
             VmError::UndefinedVariable { name, ip } => {
-                write!(f, "undefined variable at {}: {}", ip, name)
+                write!(f, "undefined variable at instruction {}: {}", ip, name)
             }
 
             VmError::DivisionByZero { ip } => {
-                write!(f, "division by zero at {}", ip)
+                write!(f, "division by zero at instruction {}", ip)
             }
         }
     }
@@ -346,9 +355,25 @@ fn main() {
 
     let source = fs::read_to_string(&args[1]).expect("Failed to read file");
 
+    let instructions = match parse(&source) {
+        Ok(instructions) => instructions,
+        Err(e) => {
+            eprintln!("Parse error: {:?}", e);
+            return;
+        }
+    };
+
+    if let Err(error) = vm.execute(&instructions) {
+        eprintln!("VM error: {}", error);
+    }
+}
+
+fn parse(source: &str) -> Result<Vec<Instruction>, ParseError> {
     let mut instructions: Vec<Instruction> = Vec::new();
 
-    for line in source.lines() {
+    for (line_number, line) in source.lines().enumerate() {
+        let line_number = line_number + 1;
+
         let parts: Vec<&str> = line.split_whitespace().collect();
 
         if parts.is_empty() || parts[0].starts_with('#') {
@@ -357,15 +382,52 @@ fn main() {
 
         match parts[0] {
             "push" => {
+                if parts.len() < 2 {
+                    return Err(ParseError::MissingArgument {
+                        instruction: String::from("push"),
+                        line: line_number,
+                    });
+                }
+
+                if parts.len() > 2 {
+                    return Err(ParseError::UnexpectedArgument {
+                        instruction: String::from("push"),
+                        line: line_number,
+                    });
+                }
+
                 let value = if parts[1].contains('.') {
-                    Value::Float(parts[1].parse().unwrap())
+                    match parts[1].parse::<f64>() {
+                        Ok(value) => Value::Float(value),
+                        Err(_) => {
+                            return Err(ParseError::InvalidNumber {
+                                value: String::from(parts[1]),
+                                line: line_number,
+                            });
+                        }
+                    }
                 } else {
-                    Value::Int(parts[1].parse().unwrap())
+                    match parts[1].parse::<i32>() {
+                        Ok(value) => Value::Int(value),
+                        Err(_) => {
+                            return Err(ParseError::InvalidNumber {
+                                value: String::from(parts[1]),
+                                line: line_number,
+                            });
+                        }
+                    }
                 };
 
                 instructions.push(Instruction::Push(value));
             }
             "pushstr" => {
+                if parts.len() < 2 {
+                    return Err(ParseError::MissingArgument {
+                        instruction: String::from("pushstr"),
+                        line: line_number,
+                    });
+                }
+
                 instructions.push(Instruction::PushStr(parts[1].to_string()));
             }
             "pushspace" => {
@@ -387,16 +449,53 @@ fn main() {
                 instructions.push(Instruction::Div);
             }
             "store" => {
+                if parts.len() < 2 {
+                    return Err(ParseError::MissingArgument {
+                        instruction: String::from("store"),
+                        line: line_number,
+                    });
+                }
+
                 instructions.push(Instruction::Store(parts[1].to_string()));
             }
             "load" => {
+                if parts.len() < 2 {
+                    return Err(ParseError::MissingArgument {
+                        instruction: String::from("load"),
+                        line: line_number,
+                    });
+                }
+
                 instructions.push(Instruction::Load(parts[1].to_string()));
             }
             "drop" => {
+                if parts.len() < 2 {
+                    return Err(ParseError::MissingArgument {
+                        instruction: String::from("drop"),
+                        line: line_number,
+                    });
+                }
+
                 instructions.push(Instruction::Drop(parts[1].to_string()));
             }
             "jump" => {
-                let address: usize = parts[1].parse().unwrap();
+                if parts.len() < 2 {
+                    return Err(ParseError::MissingArgument {
+                        instruction: String::from("jump"),
+                        line: line_number,
+                    });
+                }
+
+                let address = match parts[1].parse::<usize>() {
+                    Ok(address) => address,
+                    Err(_) => {
+                        return Err(ParseError::InvalidNumber {
+                            value: String::from(parts[1]),
+                            line: line_number,
+                        });
+                    }
+                };
+
                 instructions.push(Instruction::Jump(address));
             }
             "print" => {
@@ -406,27 +505,35 @@ fn main() {
                 instructions.push(Instruction::Println);
             }
             "read" => {
+                if parts.len() < 2 {
+                    return Err(ParseError::MissingArgument {
+                        instruction: String::from("read"),
+                        line: line_number,
+                    });
+                }
+
                 match parts[1] {
                     "int" => instructions.push(Instruction::Read(ReadType::Int)),
                     "float" => instructions.push(Instruction::Read(ReadType::Float)),
                     "string" => instructions.push(Instruction::Read(ReadType::String)),
-                    _ => {
-                        println!("Unknown type");
-                        break;
+                    value => {
+                        return Err(ParseError::InvalidReadType {
+                            value: String::from(value),
+                            line: line_number,
+                        });
                     }
                 };
             }
             "exit" => {
                 instructions.push(Instruction::Exit);
             }
-            _ => {
-                println!("Unknown instruction: {}", parts[0]);
-                return;
+            instruction => {
+                return Err(ParseError::UnknownInstruction {
+                    instruction: String::from(instruction),
+                    line: line_number,
+                });
             }
         }
     }
-
-    if let Err(error) = vm.execute(&instructions) {
-        eprintln!("VM error: {}", error);
-    }
+    Ok(instructions)
 }
