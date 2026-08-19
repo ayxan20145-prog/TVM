@@ -10,9 +10,15 @@ pub fn parse(source: &str) -> Result<Vec<Instruction>, ParseError> {
     for (line_number, line) in source.lines().enumerate() {
         let line_number = line_number + 1;
 
+        let line = if let Some(comment_start) = line.find('#') {
+            &line[..comment_start]
+        } else {
+            line
+        };
+
         let parts: Vec<&str> = line.split_whitespace().collect();
 
-        if parts.is_empty() || parts[0].starts_with('#') {
+        if parts.is_empty() {
             continue;
         }
 
