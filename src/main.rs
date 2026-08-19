@@ -1,7 +1,7 @@
 use std::{collections::HashMap, env, fs};
 
 enum Instruction {
-    Push(i32),
+    Push(Value),
     Pop,
     Add,
     Sub,
@@ -16,9 +16,15 @@ enum Instruction {
     Exit,
 }
 
+#[derive(Debug, Clone, Copy)]
+enum Value {
+    Int(i32),
+    Float(f64),
+}
+
 struct VM {
-    stack: Vec<i32>,
-    variables: HashMap<String, i32>,
+    stack: Vec<Value>,
+    variables: HashMap<String, Value>,
     ip: usize,
 }
 
@@ -43,25 +49,65 @@ impl VM {
                     let b = self.stack.pop().unwrap();
                     let a = self.stack.pop().unwrap();
 
-                    self.stack.push(a + b);
+                    let result = match (a, b) {
+                        (Value::Int(a), Value::Int(b)) => Value::Int(a + b),
+
+                        (Value::Float(a), Value::Float(b)) => Value::Float(a + b),
+
+                        (Value::Int(a), Value::Float(b)) => Value::Float(a as f64 + b),
+
+                        (Value::Float(a), Value::Int(b)) => Value::Float(a + b as f64),
+                    };
+
+                    self.stack.push(result);
                 }
                 Instruction::Sub => {
                     let b = self.stack.pop().unwrap();
                     let a = self.stack.pop().unwrap();
 
-                    self.stack.push(a - b);
+                    let result = match (a, b) {
+                        (Value::Int(a), Value::Int(b)) => Value::Int(a - b),
+
+                        (Value::Float(a), Value::Float(b)) => Value::Float(a - b),
+
+                        (Value::Int(a), Value::Float(b)) => Value::Float(a as f64 - b),
+
+                        (Value::Float(a), Value::Int(b)) => Value::Float(a - b as f64),
+                    };
+
+                    self.stack.push(result);
                 }
                 Instruction::Mul => {
                     let b = self.stack.pop().unwrap();
                     let a = self.stack.pop().unwrap();
 
-                    self.stack.push(a * b);
+                    let result = match (a, b) {
+                        (Value::Int(a), Value::Int(b)) => Value::Int(a * b),
+
+                        (Value::Float(a), Value::Float(b)) => Value::Float(a * b),
+
+                        (Value::Int(a), Value::Float(b)) => Value::Float(a as f64 * b),
+
+                        (Value::Float(a), Value::Int(b)) => Value::Float(a * b as f64),
+                    };
+
+                    self.stack.push(result);
                 }
                 Instruction::Div => {
                     let b = self.stack.pop().unwrap();
                     let a = self.stack.pop().unwrap();
 
-                    self.stack.push(a / b);
+                    let result = match (a, b) {
+                        (Value::Int(a), Value::Int(b)) => Value::Int(a / b),
+
+                        (Value::Float(a), Value::Float(b)) => Value::Float(a / b),
+
+                        (Value::Int(a), Value::Float(b)) => Value::Float(a as f64 / b),
+
+                        (Value::Float(a), Value::Int(b)) => Value::Float(a / b as f64),
+                    };
+
+                    self.stack.push(result);
                 }
                 Instruction::Store(name) => {
                     let value = self.stack.pop().unwrap();
@@ -72,7 +118,7 @@ impl VM {
                     if let Some(&value) = self.variables.get(name) {
                         self.stack.push(value);
                     } else {
-                        println!("Undefined variable: {}", name);
+                        panic!("Undefined variable: {}", name);
                     }
                 }
                 Instruction::Drop(name) => {
@@ -83,7 +129,7 @@ impl VM {
                     continue;
                 }
                 Instruction::Print => {
-                    println!("{:?}", self.stack);
+                    println!("{:?}", self.stack.pop().unwrap());
                 }
                 Instruction::Println => {
                     println!();
@@ -120,7 +166,12 @@ fn main() {
 
         match parts[0] {
             "push" => {
-                let value: i32 = parts[1].parse().unwrap();
+                let value = if parts[1].contains('.') {
+                    Value::Float(parts[1].parse().unwrap())
+                } else {
+                    Value::Int(parts[1].parse().unwrap())
+                };
+
                 instructions.push(Instruction::Push(value));
             }
             "pop" => {
