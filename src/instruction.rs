@@ -16,6 +16,7 @@ pub enum Instruction {
     Print,
     Println,
     Read(ReadType),
+    JumpIf(Value, usize),
     Exit,
 }
 

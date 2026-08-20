@@ -1,0 +1,8 @@
+# Jumpif
+#
+push 4 # Push 4 to stack
+jumpif 4 3 # If the top value in stack is 4 jump to instruction 3
+exit # Exit the program
+push 5 # Push 5 to stack
+print # Print top value in stack
+println # Print a new line

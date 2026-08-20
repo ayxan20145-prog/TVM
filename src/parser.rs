@@ -139,6 +139,35 @@ pub fn parse(source: &str) -> Result<Vec<Instruction>, ParseError> {
                     }
                 };
             }
+            "jumpif" => {
+                check_args(&parts, 2, "jumpif", line_number)?;
+
+                let value = if parts[1].contains('.') {
+                    match parts[1].parse::<f64>() {
+                        Ok(value) => Value::Float(value),
+                        Err(_) => {
+                            return Err(ParseError::InvalidNumber {
+                                value: String::from(parts[1]),
+                                line: line_number,
+                            });
+                        }
+                    }
+                } else {
+                    match parts[1].parse::<i32>() {
+                        Ok(value) => Value::Int(value),
+                        Err(_) => Value::String(String::from(parts[1])),
+                    }
+                };
+
+                let address = parts[2]
+                    .parse::<usize>()
+                    .map_err(|_| ParseError::InvalidNumber {
+                        value: String::from(parts[2]),
+                        line: line_number,
+                    })?;
+
+                instructions.push(Instruction::JumpIf(value, address));
+            }
             "exit" => {
                 check_args(&parts, 0, "exit", line_number)?;
 

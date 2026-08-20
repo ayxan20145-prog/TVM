@@ -237,6 +237,21 @@ impl VM {
                         self.stack.push(Value::String(input.trim().to_string()));
                     }
                 },
+                Instruction::JumpIf(value, address) => {
+                    let top = self.pop()?;
+
+                    let equal = match (&top, value) {
+                        (Value::Int(a), Value::Int(b)) => a == b,
+                        (Value::Float(a), Value::Float(b)) => a == b,
+                        (Value::String(a), Value::String(b)) => a == b,
+                        _ => false,
+                    };
+
+                    if equal {
+                        self.ip = *address;
+                        continue;
+                    }
+                }
                 Instruction::Exit => {
                     break;
                 }
