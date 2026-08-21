@@ -1,0 +1,48 @@
+# Example calculator program
+#
+read int # Take user input as int
+store num1 # Assign the input as num1
+
+read int # Take user input as int
+store num2 # Assign the input as num2
+
+read string # Take user input as string
+store oper # Assign the input as oper
+
+load oper # Load oper to stack
+jumpif + 11 # If the last value in stack is + jump to instruction 11
+jumpif - 18 # If the last value in stack is - jump to instruction 18
+jumpif * 25 # If the last value in stack is * jump to instruction 25
+jumpif / 32 # If the last value in stack is / jump to instruction 32
+
+pop # Pop the last value from stack
+load num1 # Load num1 to stack
+load num2 # Load num2 to stack
+add # Add last 2 values in stack
+print # Print last value in stack
+println # Print a new line
+exit # Exit the vm
+
+pop # Pop the last value from stack
+load num1 # Load num1 to stack
+load num2 # Load num2 to stack
+sub # Sublast 2 values in stack
+print # Print last value in stack
+println # Print a new line
+exit # Exit the vm
+
+pop # Pop the last value from stack
+load num1 # Load num1 to stack
+load num2 # Load num2 to stack
+mul # Mul last 2 values in stack
+print # Print last value in stack
+println # Print a new line
+exit # Exit the vm
+
+pop # Pop the last value from stack
+load num1 # Load num1 to stack
+load num2 # Load num2 to stack
+div # Div last 2 values in stack
+print # Print last value in stack
+println # Print a new line
+exit # Exit the vm
