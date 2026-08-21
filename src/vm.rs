@@ -274,6 +274,18 @@ impl VM {
                         ip: self.ip,
                     })?;
                 }
+                Instruction::CreateDir(path) => {
+                    fs::create_dir(path).map_err(|_| VmError::InvalidPath {
+                        path: String::from(path),
+                        ip: self.ip,
+                    })?;
+                }
+                Instruction::RemoveDir(path) => {
+                    fs::remove_dir(path).map_err(|_| VmError::InvalidPath {
+                        path: String::from(path),
+                        ip: self.ip,
+                    })?;
+                }
                 Instruction::Exit => {
                     break;
                 }

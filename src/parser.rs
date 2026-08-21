@@ -193,6 +193,20 @@ pub fn parse(source: &str) -> Result<Vec<Instruction>, ParseError> {
 
                 instructions.push(Instruction::RemoveF(String::from(path)));
             }
+            "createdir" => {
+                check_args(&parts, 1, "createdir", line_number)?;
+
+                let path = parts[1];
+
+                instructions.push(Instruction::CreateDir(String::from(path)));
+            }
+            "removedir" => {
+                check_args(&parts, 1, "removedir", line_number)?;
+
+                let path = parts[1];
+
+                instructions.push(Instruction::RemoveDir(String::from(path)));
+            }
             "exit" => {
                 check_args(&parts, 0, "exit", line_number)?;
 

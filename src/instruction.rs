@@ -20,6 +20,8 @@ pub enum Instruction {
     ReadF(String),
     WriteF(String, String),
     RemoveF(String),
+    CreateDir(String),
+    RemoveDir(String),
     Exit,
 }
 

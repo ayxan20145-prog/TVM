@@ -5,3 +5,5 @@ readf hi.txt # Read file "hi.txt" and push to stack
 print # Print last value in stack
 println # Print a new line
 removef hi.txt # Remove file "hi.txt"
+createdir hi # Create directory "hi"
+removedir hi # Remove directory "hi"
