@@ -238,7 +238,10 @@ impl VM {
                     }
                 },
                 Instruction::JumpIf(value, address) => {
-                    let top = self.pop()?;
+                    let top = self
+                        .stack
+                        .last()
+                        .ok_or(VmError::StackUnderflow { ip: self.ip })?;
 
                     let equal = match (&top, value) {
                         (Value::Int(a), Value::Int(b)) => a == b,
