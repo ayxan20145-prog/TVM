@@ -223,7 +223,7 @@ impl VM {
                             Ok(e) => e,
                             Err(e) => {
                                 println!("Error: {}", e);
-                                break;
+                                return Err(VmError::InvalidInput { input, ip: self.ip });
                             }
                         };
                         self.stack.push(Value::Float(input));
