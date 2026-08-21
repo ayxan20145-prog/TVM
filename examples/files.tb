@@ -1,0 +1,7 @@
+# Reading, Writing and Removing files
+#
+writef hi.txt hi # Write file "hi.txt" with the content "hi"
+readf hi.txt # Read file "hi.txt" and push to stack
+print # Print last value in stack
+println # Print a new line
+removef hi.txt # Remove file "hi.txt"

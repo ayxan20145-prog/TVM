@@ -22,6 +22,10 @@ pub enum VmError {
         input: String,
         ip: usize,
     },
+    InvalidPath {
+        path: String,
+        ip: usize,
+    },
 }
 
 pub enum ParseError {
@@ -62,6 +66,10 @@ impl fmt::Display for VmError {
 
             VmError::InvalidInput { input, ip } => {
                 write!(f, "invalid input at instruction {}: {}", ip, input)
+            }
+
+            VmError::InvalidPath { path, ip } => {
+                write!(f, "invalid path at instruction {}: {}", ip, path)
             }
         }
     }

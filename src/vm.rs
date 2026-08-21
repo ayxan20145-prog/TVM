@@ -3,7 +3,7 @@ use crate::{
     instruction::{Instruction, ReadType},
     value::Value,
 };
-use std::{collections::HashMap, io};
+use std::{collections::HashMap, fs, io};
 
 pub struct VM {
     stack: Vec<Value>,
@@ -206,8 +206,7 @@ impl VM {
 
                         let input: i32 = match input.trim().parse() {
                             Ok(e) => e,
-                            Err(e) => {
-                                println!("Error: {}", e);
+                            Err(_) => {
                                 return Err(VmError::InvalidInput { input, ip: self.ip });
                             }
                         };
@@ -254,6 +253,26 @@ impl VM {
                         self.ip = *address;
                         continue;
                     }
+                }
+                Instruction::ReadF(path) => {
+                    let content = fs::read_to_string(path).map_err(|_| VmError::InvalidPath {
+                        path: String::from(path),
+                        ip: self.ip,
+                    })?;
+
+                    self.stack.push(Value::String(content));
+                }
+                Instruction::WriteF(path, content) => {
+                    fs::write(path, content).map_err(|_| VmError::InvalidPath {
+                        path: String::from(path),
+                        ip: self.ip,
+                    })?;
+                }
+                Instruction::RemoveF(path) => {
+                    fs::remove_file(path).map_err(|_| VmError::InvalidPath {
+                        path: String::from(path),
+                        ip: self.ip,
+                    })?;
                 }
                 Instruction::Exit => {
                     break;

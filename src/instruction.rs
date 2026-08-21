@@ -17,6 +17,9 @@ pub enum Instruction {
     Println,
     Read(ReadType),
     JumpIf(Value, usize),
+    ReadF(String),
+    WriteF(String, String),
+    RemoveF(String),
     Exit,
 }
 
