@@ -22,6 +22,11 @@ pub enum VmError {
         path: String,
         ip: usize,
     },
+    ConversionError {
+        from: Value,
+        to: String,
+        ip: usize,
+    },
 }
 
 pub enum ParseError {
@@ -61,6 +66,13 @@ impl fmt::Display for VmError {
 
             VmError::InvalidPath { path, ip } => {
                 write!(f, "invalid path at instruction {}: {}", ip, path)
+            }
+            VmError::ConversionError { from, to, ip } => {
+                write!(
+                    f,
+                    "conversion error at instruction {}: cannot convert {} to {}",
+                    ip, from, to
+                )
             }
         }
     }

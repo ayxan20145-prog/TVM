@@ -256,12 +256,14 @@ impl VM {
 
                     match value {
                         Value::String(s) => {
-                            let i = s.trim().parse::<i32>().map_err(|_| VmError::TypeMismatch {
-                                operation: String::from("stoi"),
-                                left: Value::String(s.clone()),
-                                right: Value::String(String::new()),
-                                ip: self.ip,
-                            })?;
+                            let i =
+                                s.trim()
+                                    .parse::<i32>()
+                                    .map_err(|_| VmError::ConversionError {
+                                        from: Value::String(s.clone()),
+                                        to: String::from("int"),
+                                        ip: self.ip,
+                                    })?;
 
                             self.stack.push(Value::Int(i));
                         }
@@ -280,12 +282,14 @@ impl VM {
 
                     match value {
                         Value::String(s) => {
-                            let f = s.trim().parse::<f64>().map_err(|_| VmError::TypeMismatch {
-                                operation: String::from("stof"),
-                                left: Value::String(s.clone()),
-                                right: Value::String(String::new()),
-                                ip: self.ip,
-                            })?;
+                            let f =
+                                s.trim()
+                                    .parse::<f64>()
+                                    .map_err(|_| VmError::ConversionError {
+                                        from: Value::String(s.clone()),
+                                        to: String::from("float"),
+                                        ip: self.ip,
+                                    })?;
 
                             self.stack.push(Value::Float(f));
                         }
