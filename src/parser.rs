@@ -55,6 +55,18 @@ pub fn parse(source: &str) -> Result<Vec<Instruction>, ParseError> {
                 check_args(&parts, 0, "pushspace", line_number)?;
                 instructions.push(Instruction::PushSpace);
             }
+            "pushbool" => {
+                check_args(&parts, 1, "pushbool", line_number)?;
+
+                let value = parts[1]
+                    .parse::<bool>()
+                    .map_err(|_| ParseError::InvalidNumber {
+                        value: String::from(parts[1]),
+                        line: line_number,
+                    })?;
+
+                instructions.push(Instruction::PushBool(value));
+            }
             "pop" => {
                 check_args(&parts, 0, "pop", line_number)?;
 

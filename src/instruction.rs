@@ -4,6 +4,7 @@ pub enum Instruction {
     Push(Value),
     PushStr(String),
     PushSpace,
+    PushBool(bool),
     Pop,
     Add,
     Sub,

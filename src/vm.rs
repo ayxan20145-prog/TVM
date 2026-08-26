@@ -32,6 +32,9 @@ impl VM {
                 Instruction::PushSpace => {
                     self.stack.push(Value::String(String::from(" ")));
                 }
+                Instruction::PushBool(value) => {
+                    self.stack.push(Value::Bool(value.clone()));
+                }
                 Instruction::Pop => {
                     self.pop()?;
                 }
@@ -211,6 +214,7 @@ impl VM {
                         (Value::Int(a), Value::Int(b)) => a == b,
                         (Value::Float(a), Value::Float(b)) => a == b,
                         (Value::String(a), Value::String(b)) => a == b,
+                        (Value::Bool(a), Value::Bool(b)) => a == b,
                         _ => false,
                     };
 
