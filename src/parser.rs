@@ -1,8 +1,4 @@
-use crate::{
-    error::ParseError,
-    instruction::{Instruction, ReadType},
-    value::Value,
-};
+use crate::{error::ParseError, instruction::Instruction, value::Value};
 
 pub fn parse(source: &str) -> Result<Vec<Instruction>, ParseError> {
     let mut instructions: Vec<Instruction> = Vec::new();
@@ -125,19 +121,9 @@ pub fn parse(source: &str) -> Result<Vec<Instruction>, ParseError> {
                 instructions.push(Instruction::Println);
             }
             "read" => {
-                check_args(&parts, 1, "read", line_number)?;
+                check_args(&parts, 0, "read", line_number)?;
 
-                match parts[1] {
-                    "int" => instructions.push(Instruction::Read(ReadType::Int)),
-                    "float" => instructions.push(Instruction::Read(ReadType::Float)),
-                    "string" => instructions.push(Instruction::Read(ReadType::String)),
-                    value => {
-                        return Err(ParseError::InvalidReadType {
-                            value: String::from(value),
-                            line: line_number,
-                        });
-                    }
-                };
+                instructions.push(Instruction::Read);
             }
             "jumpif" => {
                 check_args(&parts, 2, "jumpif", line_number)?;
@@ -206,6 +192,36 @@ pub fn parse(source: &str) -> Result<Vec<Instruction>, ParseError> {
                 let path = parts[1];
 
                 instructions.push(Instruction::RemoveDir(String::from(path)));
+            }
+            "stoi" => {
+                check_args(&parts, 0, "stoi", line_number)?;
+
+                instructions.push(Instruction::StoI);
+            }
+            "stof" => {
+                check_args(&parts, 0, "stof", line_number)?;
+
+                instructions.push(Instruction::StoF);
+            }
+            "itof" => {
+                check_args(&parts, 0, "itof", line_number)?;
+
+                instructions.push(Instruction::ItoF);
+            }
+            "itos" => {
+                check_args(&parts, 0, "itos", line_number)?;
+
+                instructions.push(Instruction::ItoS);
+            }
+            "ftoi" => {
+                check_args(&parts, 0, "ftoi", line_number)?;
+
+                instructions.push(Instruction::FtoI);
+            }
+            "ftos" => {
+                check_args(&parts, 0, "ftos", line_number)?;
+
+                instructions.push(Instruction::FtoS);
             }
             "exit" => {
                 check_args(&parts, 0, "exit", line_number)?;

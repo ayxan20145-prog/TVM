@@ -15,18 +15,18 @@ pub enum Instruction {
     Jump(usize),
     Print,
     Println,
-    Read(ReadType),
+    Read,
     JumpIf(Value, usize),
     ReadF(String),
     WriteF(String, String),
     RemoveF(String),
     CreateDir(String),
     RemoveDir(String),
+    StoI,
+    StoF,
+    ItoF,
+    ItoS,
+    FtoI,
+    FtoS,
     Exit,
-}
-
-pub enum ReadType {
-    Int,
-    Float,
-    String,
 }

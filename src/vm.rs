@@ -1,8 +1,4 @@
-use crate::{
-    error::VmError,
-    instruction::{Instruction, ReadType},
-    value::Value,
-};
+use crate::{error::VmError, instruction::Instruction, value::Value};
 use std::{collections::HashMap, fs, io};
 
 pub struct VM {
@@ -197,45 +193,14 @@ impl VM {
                 Instruction::Println => {
                     println!();
                 }
-                Instruction::Read(value) => match value {
-                    ReadType::Int => {
-                        let mut input = String::new();
-                        io::stdin()
-                            .read_line(&mut input)
-                            .expect("Failed to read line");
+                Instruction::Read => {
+                    let mut input = String::new();
+                    io::stdin()
+                        .read_line(&mut input)
+                        .expect("Failed to read line");
 
-                        let input: i32 = match input.trim().parse() {
-                            Ok(e) => e,
-                            Err(_) => {
-                                return Err(VmError::InvalidInput { input, ip: self.ip });
-                            }
-                        };
-                        self.stack.push(Value::Int(input));
-                    }
-                    ReadType::Float => {
-                        let mut input = String::new();
-                        io::stdin()
-                            .read_line(&mut input)
-                            .expect("Failed to read line");
-
-                        let input: f64 = match input.trim().parse() {
-                            Ok(e) => e,
-                            Err(e) => {
-                                println!("Error: {}", e);
-                                return Err(VmError::InvalidInput { input, ip: self.ip });
-                            }
-                        };
-                        self.stack.push(Value::Float(input));
-                    }
-                    ReadType::String => {
-                        let mut input = String::new();
-                        io::stdin()
-                            .read_line(&mut input)
-                            .expect("Failed to read line");
-
-                        self.stack.push(Value::String(input.trim().to_string()));
-                    }
-                },
+                    self.stack.push(Value::String(input.trim().to_string()));
+                }
                 Instruction::JumpIf(value, address) => {
                     let top = self
                         .stack
@@ -285,6 +250,118 @@ impl VM {
                         path: String::from(path),
                         ip: self.ip,
                     })?;
+                }
+                Instruction::StoI => {
+                    let value = self.pop()?;
+
+                    match value {
+                        Value::String(s) => {
+                            let i = s.trim().parse::<i32>().map_err(|_| VmError::TypeMismatch {
+                                operation: String::from("stoi"),
+                                left: Value::String(s.clone()),
+                                right: Value::String(String::new()),
+                                ip: self.ip,
+                            })?;
+
+                            self.stack.push(Value::Int(i));
+                        }
+                        other => {
+                            return Err(VmError::TypeMismatch {
+                                operation: String::from("stoi"),
+                                left: other,
+                                right: Value::String(String::new()),
+                                ip: self.ip,
+                            });
+                        }
+                    }
+                }
+                Instruction::StoF => {
+                    let value = self.pop()?;
+
+                    match value {
+                        Value::String(s) => {
+                            let f = s.trim().parse::<f64>().map_err(|_| VmError::TypeMismatch {
+                                operation: String::from("stof"),
+                                left: Value::String(s.clone()),
+                                right: Value::String(String::new()),
+                                ip: self.ip,
+                            })?;
+
+                            self.stack.push(Value::Float(f));
+                        }
+                        other => {
+                            return Err(VmError::TypeMismatch {
+                                operation: String::from("stof"),
+                                left: other,
+                                right: Value::String(String::new()),
+                                ip: self.ip,
+                            });
+                        }
+                    }
+                }
+                Instruction::ItoF => {
+                    let value = self.pop()?;
+
+                    match value {
+                        Value::Int(i) => {
+                            self.stack.push(Value::Float(i as f64));
+                        }
+                        other => {
+                            return Err(VmError::TypeMismatch {
+                                operation: String::from("itof"),
+                                left: other,
+                                right: Value::String(String::new()),
+                                ip: self.ip,
+                            });
+                        }
+                    }
+                }
+                Instruction::ItoS => {
+                    let value = self.pop()?;
+
+                    match value {
+                        Value::Int(i) => self.stack.push(Value::String(i.to_string())),
+                        other => {
+                            return Err(VmError::TypeMismatch {
+                                operation: String::from("itos"),
+                                left: other,
+                                right: Value::String(String::new()),
+                                ip: self.ip,
+                            });
+                        }
+                    }
+                }
+                Instruction::FtoI => {
+                    let value = self.pop()?;
+
+                    match value {
+                        Value::Float(f) => {
+                            self.stack.push(Value::Int(f as i32));
+                        }
+                        other => {
+                            return Err(VmError::TypeMismatch {
+                                operation: String::from("ftoi"),
+                                left: other,
+                                right: Value::String(String::new()),
+                                ip: self.ip,
+                            });
+                        }
+                    }
+                }
+                Instruction::FtoS => {
+                    let value = self.pop()?;
+
+                    match value {
+                        Value::Float(f) => self.stack.push(Value::String(f.to_string())),
+                        other => {
+                            return Err(VmError::TypeMismatch {
+                                operation: String::from("ftos"),
+                                left: other,
+                                right: Value::String(String::new()),
+                                ip: self.ip,
+                            });
+                        }
+                    }
                 }
                 Instruction::Exit => {
                     break;

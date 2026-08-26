@@ -18,10 +18,6 @@ pub enum VmError {
     DivisionByZero {
         ip: usize,
     },
-    InvalidInput {
-        input: String,
-        ip: usize,
-    },
     InvalidPath {
         path: String,
         ip: usize,
@@ -32,7 +28,6 @@ pub enum ParseError {
     UnknownInstruction { instruction: String, line: usize },
     MissingArgument { instruction: String, line: usize },
     UnexpectedArgument { instruction: String, line: usize },
-    InvalidReadType { value: String, line: usize },
     InvalidNumber { value: String, line: usize },
 }
 
@@ -64,10 +59,6 @@ impl fmt::Display for VmError {
                 write!(f, "division by zero at instruction {}", ip)
             }
 
-            VmError::InvalidInput { input, ip } => {
-                write!(f, "invalid input at instruction {}: {}", ip, input)
-            }
-
             VmError::InvalidPath { path, ip } => {
                 write!(f, "invalid path at instruction {}: {}", ip, path)
             }
@@ -88,10 +79,6 @@ impl fmt::Display for ParseError {
 
             ParseError::UnexpectedArgument { instruction, line } => {
                 write!(f, "unexpected argument at line {}: {}", line, instruction)
-            }
-
-            ParseError::InvalidReadType { value, line } => {
-                write!(f, "invalid read type at line {}: {}", line, value)
             }
 
             ParseError::InvalidNumber { value, line } => {
