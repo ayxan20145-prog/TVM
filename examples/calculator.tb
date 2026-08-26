@@ -1,12 +1,14 @@
 # Example calculator program
 #
-read int # Take user input as int
+read # Take user input
+stoi # Convert top value in stack from str to int
 store num1 # Assign the input as num1
 
-read int # Take user input as int
+read # Take user input
+stoi # Convert top value in stack from str to int
 store num2 # Assign the input as num2
 
-read string # Take user input as string
+read # Take user input
 store oper # Assign the input as oper
 
 load oper # Load oper to stack
