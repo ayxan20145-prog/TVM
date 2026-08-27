@@ -72,6 +72,11 @@ pub fn parse(source: &str) -> Result<Vec<Instruction>, ParseError> {
 
                 instructions.push(Instruction::Pop);
             }
+            "dup" => {
+                check_args(&parts, 0, "dup", line_number)?;
+
+                instructions.push(Instruction::Dup);
+            }
             "add" => {
                 check_args(&parts, 0, "add", line_number)?;
 

@@ -6,6 +6,7 @@ pub enum Instruction {
     PushBool(bool),
     PushSpace,
     Pop,
+    Dup,
     Add,
     Sub,
     Mul,

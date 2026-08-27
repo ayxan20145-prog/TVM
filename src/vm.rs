@@ -38,6 +38,12 @@ impl VM {
                 Instruction::Pop => {
                     self.pop()?;
                 }
+                Instruction::Dup => {
+                    let value = self.pop()?;
+
+                    self.stack.push(value.clone());
+                    self.stack.push(value);
+                }
                 Instruction::Add => {
                     let b = self.pop()?;
                     let a = self.pop()?;
