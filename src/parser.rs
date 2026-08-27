@@ -132,6 +132,11 @@ pub fn parse(source: &str) -> Result<Vec<Instruction>, ParseError> {
 
                 instructions.push(Instruction::Println);
             }
+            "debug" => {
+                check_args(&parts, 0, "debug", line_number)?;
+
+                instructions.push(Instruction::Debug);
+            }
             "read" => {
                 check_args(&parts, 0, "read", line_number)?;
 
@@ -140,7 +145,9 @@ pub fn parse(source: &str) -> Result<Vec<Instruction>, ParseError> {
             "jumpif" => {
                 check_args(&parts, 2, "jumpif", line_number)?;
 
-                let value = if parts[1].contains('.') {
+                let value = if let Ok(value) = parts[1].parse::<bool>() {
+                    Value::Bool(value)
+                } else if parts[1].contains('.') {
                     match parts[1].parse::<f64>() {
                         Ok(value) => Value::Float(value),
                         Err(_) => {
@@ -215,6 +222,11 @@ pub fn parse(source: &str) -> Result<Vec<Instruction>, ParseError> {
 
                 instructions.push(Instruction::StoF);
             }
+            "stob" => {
+                check_args(&parts, 0, "stob", line_number)?;
+
+                instructions.push(Instruction::StoB);
+            }
             "itof" => {
                 check_args(&parts, 0, "itof", line_number)?;
 
@@ -225,6 +237,11 @@ pub fn parse(source: &str) -> Result<Vec<Instruction>, ParseError> {
 
                 instructions.push(Instruction::ItoS);
             }
+            "itob" => {
+                check_args(&parts, 0, "itob", line_number)?;
+
+                instructions.push(Instruction::ItoB);
+            }
             "ftoi" => {
                 check_args(&parts, 0, "ftoi", line_number)?;
 
@@ -234,6 +251,26 @@ pub fn parse(source: &str) -> Result<Vec<Instruction>, ParseError> {
                 check_args(&parts, 0, "ftos", line_number)?;
 
                 instructions.push(Instruction::FtoS);
+            }
+            "ftob" => {
+                check_args(&parts, 0, "ftob", line_number)?;
+
+                instructions.push(Instruction::FtoB);
+            }
+            "btoi" => {
+                check_args(&parts, 0, "btoi", line_number)?;
+
+                instructions.push(Instruction::BtoI);
+            }
+            "btof" => {
+                check_args(&parts, 0, "btof", line_number)?;
+
+                instructions.push(Instruction::BtoF);
+            }
+            "btos" => {
+                check_args(&parts, 0, "btos", line_number)?;
+
+                instructions.push(Instruction::BtoS);
             }
             "exit" => {
                 check_args(&parts, 0, "exit", line_number)?;

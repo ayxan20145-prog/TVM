@@ -196,6 +196,9 @@ impl VM {
                 Instruction::Println => {
                     println!();
                 }
+                Instruction::Debug => {
+                    print!("{:?}", self.stack);
+                }
                 Instruction::Read => {
                     let mut input = String::new();
                     io::stdin()
@@ -307,6 +310,32 @@ impl VM {
                         }
                     }
                 }
+                Instruction::StoB => {
+                    let value = self.pop()?;
+
+                    match value {
+                        Value::String(s) => {
+                            let b =
+                                s.trim()
+                                    .parse::<bool>()
+                                    .map_err(|_| VmError::ConversionError {
+                                        from: Value::String(s.clone()),
+                                        to: String::from("bool"),
+                                        ip: self.ip,
+                                    })?;
+
+                            self.stack.push(Value::Bool(b));
+                        }
+                        other => {
+                            return Err(VmError::TypeMismatch {
+                                operation: String::from("stob"),
+                                left: other,
+                                right: Value::String(String::new()),
+                                ip: self.ip,
+                            });
+                        }
+                    }
+                }
                 Instruction::ItoF => {
                     let value = self.pop()?;
 
@@ -339,6 +368,28 @@ impl VM {
                         }
                     }
                 }
+                Instruction::ItoB => {
+                    let value = self.pop()?;
+
+                    match value {
+                        Value::Int(i) => {
+                            let b = match i {
+                                0 => false,
+                                _ => true,
+                            };
+
+                            self.stack.push(Value::Bool(b));
+                        }
+                        other => {
+                            return Err(VmError::TypeMismatch {
+                                operation: String::from("itob"),
+                                left: other,
+                                right: Value::String(String::new()),
+                                ip: self.ip,
+                            });
+                        }
+                    }
+                }
                 Instruction::FtoI => {
                     let value = self.pop()?;
 
@@ -364,6 +415,73 @@ impl VM {
                         other => {
                             return Err(VmError::TypeMismatch {
                                 operation: String::from("ftos"),
+                                left: other,
+                                right: Value::String(String::new()),
+                                ip: self.ip,
+                            });
+                        }
+                    }
+                }
+                Instruction::FtoB => {
+                    let value = self.pop()?;
+
+                    match value {
+                        Value::Float(f) => {
+                            let b = match f {
+                                0.0 => false,
+                                _ => true,
+                            };
+
+                            self.stack.push(Value::Bool(b));
+                        }
+                        other => {
+                            return Err(VmError::TypeMismatch {
+                                operation: String::from("ftob"),
+                                left: other,
+                                right: Value::String(String::new()),
+                                ip: self.ip,
+                            });
+                        }
+                    }
+                }
+                Instruction::BtoI => {
+                    let value = self.pop()?;
+
+                    match value {
+                        Value::Bool(b) => self.stack.push(Value::Int(b as i32)),
+                        other => {
+                            return Err(VmError::TypeMismatch {
+                                operation: String::from("btoi"),
+                                left: other,
+                                right: Value::String(String::new()),
+                                ip: self.ip,
+                            });
+                        }
+                    }
+                }
+                Instruction::BtoF => {
+                    let value = self.pop()?;
+
+                    match value {
+                        Value::Bool(b) => self.stack.push(Value::Float(f64::from(b))),
+                        other => {
+                            return Err(VmError::TypeMismatch {
+                                operation: String::from("btof"),
+                                left: other,
+                                right: Value::String(String::new()),
+                                ip: self.ip,
+                            });
+                        }
+                    }
+                }
+                Instruction::BtoS => {
+                    let value = self.pop()?;
+
+                    match value {
+                        Value::Bool(b) => self.stack.push(Value::String(b.to_string())),
+                        other => {
+                            return Err(VmError::TypeMismatch {
+                                operation: String::from("btos"),
                                 left: other,
                                 right: Value::String(String::new()),
                                 ip: self.ip,
