@@ -12,10 +12,10 @@ read # Take user input
 store oper # Assign the input as oper
 
 load oper # Load oper to stack
-jumpif + 11 # If the last value in stack is + jump to instruction 11
-jumpif - 18 # If the last value in stack is - jump to instruction 18
-jumpif * 25 # If the last value in stack is * jump to instruction 25
-jumpif / 32 # If the last value in stack is / jump to instruction 32
+jumpif + 13 # If the last value in stack is + jump to instruction 13
+jumpif - 20 # If the last value in stack is - jump to instruction 20
+jumpif * 27 # If the last value in stack is * jump to instruction 27
+jumpif / 34 # If the last value in stack is / jump to instruction 34
 
 pop # Pop the last value from stack
 load num1 # Load num1 to stack
