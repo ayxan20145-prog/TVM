@@ -34,6 +34,7 @@ pub enum ParseError {
     MissingArgument { instruction: String, line: usize },
     UnexpectedArgument { instruction: String, line: usize },
     InvalidNumber { value: String, line: usize },
+    InvalidBool { value: String, line: usize },
 }
 
 impl fmt::Display for VmError {
@@ -95,6 +96,10 @@ impl fmt::Display for ParseError {
 
             ParseError::InvalidNumber { value, line } => {
                 write!(f, "invalid number at line {}: {}", line, value)
+            }
+
+            ParseError::InvalidBool { value, line } => {
+                write!(f, "invalid boolean at line {}: {}", line, value)
             }
         }
     }

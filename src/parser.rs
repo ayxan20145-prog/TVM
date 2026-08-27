@@ -60,7 +60,7 @@ pub fn parse(source: &str) -> Result<Vec<Instruction>, ParseError> {
 
                 let value = parts[1]
                     .parse::<bool>()
-                    .map_err(|_| ParseError::InvalidNumber {
+                    .map_err(|_| ParseError::InvalidBool {
                         value: String::from(parts[1]),
                         line: line_number,
                     })?;
