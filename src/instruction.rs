@@ -37,5 +37,9 @@ pub enum Instruction {
     BtoI,
     BtoF,
     BtoS,
+    Eq,
+    Ne,
+    Gt,
+    Lt,
     Exit,
 }

@@ -277,6 +277,26 @@ pub fn parse(source: &str) -> Result<Vec<Instruction>, ParseError> {
 
                 instructions.push(Instruction::BtoS);
             }
+            "eq" => {
+                check_args(&parts, 0, "eq", line_number)?;
+
+                instructions.push(Instruction::Eq);
+            }
+            "ne" => {
+                check_args(&parts, 0, "ne", line_number)?;
+
+                instructions.push(Instruction::Ne);
+            }
+            "gt" => {
+                check_args(&parts, 0, "gt", line_number)?;
+
+                instructions.push(Instruction::Gt);
+            }
+            "lt" => {
+                check_args(&parts, 0, "lt", line_number)?;
+
+                instructions.push(Instruction::Lt);
+            }
             "exit" => {
                 check_args(&parts, 0, "exit", line_number)?;
 

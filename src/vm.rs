@@ -495,6 +495,30 @@ impl VM {
                         }
                     }
                 }
+                Instruction::Eq => {
+                    let b = self.pop()?;
+                    let a = self.pop()?;
+
+                    self.stack.push(Value::Bool(a == b));
+                }
+                Instruction::Ne => {
+                    let b = self.pop()?;
+                    let a = self.pop()?;
+
+                    self.stack.push(Value::Bool(a != b));
+                }
+                Instruction::Gt => {
+                    let b = self.pop()?;
+                    let a = self.pop()?;
+
+                    self.stack.push(Value::Bool(a > b));
+                }
+                Instruction::Lt => {
+                    let b = self.pop()?;
+                    let a = self.pop()?;
+
+                    self.stack.push(Value::Bool(a < b));
+                }
                 Instruction::Exit => {
                     break;
                 }
