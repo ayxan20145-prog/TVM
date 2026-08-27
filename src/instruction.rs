@@ -37,9 +37,11 @@ pub enum Instruction {
     BtoI,
     BtoF,
     BtoS,
-    Eq,
-    Ne,
-    Gt,
-    Lt,
+    Eq, // ==
+    Ne, // !=
+    Gt, // >
+    Lt, // <
+    Ge, // >=
+    Le, // <=
     Exit,
 }

@@ -499,25 +499,135 @@ impl VM {
                     let b = self.pop()?;
                     let a = self.pop()?;
 
-                    self.stack.push(Value::Bool(a == b));
+                    let result = match (&a, &b) {
+                        (Value::Int(x), Value::Int(y)) => x == y,
+                        (Value::Float(x), Value::Float(y)) => x == y,
+                        (Value::Int(x), Value::Float(y)) => (*x as f64) == *y,
+                        (Value::Float(x), Value::Int(y)) => *x == (*y as f64),
+                        (Value::String(x), Value::String(y)) => x == y,
+                        (Value::Bool(x), Value::Bool(y)) => x == y,
+                        _ => {
+                            return Err(VmError::TypeMismatch {
+                                operation: String::from("eq"),
+                                left: a,
+                                right: b,
+                                ip: self.ip,
+                            });
+                        }
+                    };
+
+                    self.stack.push(Value::Bool(result));
                 }
                 Instruction::Ne => {
                     let b = self.pop()?;
                     let a = self.pop()?;
 
-                    self.stack.push(Value::Bool(a != b));
+                    let result = match (&a, &b) {
+                        (Value::Int(x), Value::Int(y)) => x != y,
+                        (Value::Float(x), Value::Float(y)) => x != y,
+                        (Value::Int(x), Value::Float(y)) => (*x as f64) != *y,
+                        (Value::Float(x), Value::Int(y)) => *x != (*y as f64),
+                        (Value::String(x), Value::String(y)) => x != y,
+                        (Value::Bool(x), Value::Bool(y)) => x != y,
+                        _ => {
+                            return Err(VmError::TypeMismatch {
+                                operation: String::from("ne"),
+                                left: a,
+                                right: b,
+                                ip: self.ip,
+                            });
+                        }
+                    };
+
+                    self.stack.push(Value::Bool(result));
                 }
                 Instruction::Gt => {
                     let b = self.pop()?;
                     let a = self.pop()?;
 
-                    self.stack.push(Value::Bool(a > b));
+                    let result = match (&a, &b) {
+                        (Value::Int(x), Value::Int(y)) => x > y,
+                        (Value::Float(x), Value::Float(y)) => x > y,
+                        (Value::Int(x), Value::Float(y)) => (*x as f64) > *y,
+                        (Value::Float(x), Value::Int(y)) => *x > (*y as f64),
+                        (Value::String(x), Value::String(y)) => x > y,
+                        _ => {
+                            return Err(VmError::TypeMismatch {
+                                operation: String::from("gt"),
+                                left: a,
+                                right: b,
+                                ip: self.ip,
+                            });
+                        }
+                    };
+
+                    self.stack.push(Value::Bool(result));
                 }
                 Instruction::Lt => {
                     let b = self.pop()?;
                     let a = self.pop()?;
 
-                    self.stack.push(Value::Bool(a < b));
+                    let result = match (&a, &b) {
+                        (Value::Int(x), Value::Int(y)) => x < y,
+                        (Value::Float(x), Value::Float(y)) => x < y,
+                        (Value::Int(x), Value::Float(y)) => (*x as f64) < *y,
+                        (Value::Float(x), Value::Int(y)) => *x < (*y as f64),
+                        (Value::String(x), Value::String(y)) => x < y,
+                        _ => {
+                            return Err(VmError::TypeMismatch {
+                                operation: String::from("lt"),
+                                left: a,
+                                right: b,
+                                ip: self.ip,
+                            });
+                        }
+                    };
+
+                    self.stack.push(Value::Bool(result));
+                }
+                Instruction::Ge => {
+                    let b = self.pop()?;
+                    let a = self.pop()?;
+
+                    let result = match (&a, &b) {
+                        (Value::Int(x), Value::Int(y)) => x >= y,
+                        (Value::Float(x), Value::Float(y)) => x >= y,
+                        (Value::Int(x), Value::Float(y)) => (*x as f64) >= *y,
+                        (Value::Float(x), Value::Int(y)) => *x >= (*y as f64),
+                        (Value::String(x), Value::String(y)) => x >= y,
+                        _ => {
+                            return Err(VmError::TypeMismatch {
+                                operation: String::from("ge"),
+                                left: a,
+                                right: b,
+                                ip: self.ip,
+                            });
+                        }
+                    };
+
+                    self.stack.push(Value::Bool(result));
+                }
+                Instruction::Le => {
+                    let b = self.pop()?;
+                    let a = self.pop()?;
+
+                    let result = match (&a, &b) {
+                        (Value::Int(x), Value::Int(y)) => x <= y,
+                        (Value::Float(x), Value::Float(y)) => x <= y,
+                        (Value::Int(x), Value::Float(y)) => (*x as f64) <= *y,
+                        (Value::Float(x), Value::Int(y)) => *x <= (*y as f64),
+                        (Value::String(x), Value::String(y)) => x <= y,
+                        _ => {
+                            return Err(VmError::TypeMismatch {
+                                operation: String::from("le"),
+                                left: a,
+                                right: b,
+                                ip: self.ip,
+                            });
+                        }
+                    };
+
+                    self.stack.push(Value::Bool(result));
                 }
                 Instruction::Exit => {
                     break;
