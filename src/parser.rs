@@ -293,6 +293,21 @@ pub fn parse(source: &str) -> Result<Vec<Instruction>, ParseError> {
 
                 instructions.push(Instruction::Le);
             }
+            "and" => {
+                check_args(&parts, 0, "and", line_number)?;
+
+                instructions.push(Instruction::And);
+            }
+            "or" => {
+                check_args(&parts, 0, "or", line_number)?;
+
+                instructions.push(Instruction::Or);
+            }
+            "not" => {
+                check_args(&parts, 0, "not", line_number)?;
+
+                instructions.push(Instruction::Not);
+            }
             "exit" => {
                 check_args(&parts, 0, "exit", line_number)?;
 

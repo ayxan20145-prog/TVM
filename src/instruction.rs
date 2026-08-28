@@ -43,5 +43,8 @@ pub enum Instruction {
     Lt, // <
     Ge, // >=
     Le, // <=
+    And,
+    Or,
+    Not,
     Exit,
 }

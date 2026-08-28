@@ -688,6 +688,58 @@ impl VM {
 
                     self.stack.push(Value::Bool(result));
                 }
+                Instruction::And => {
+                    let b = self.pop()?;
+                    let a = self.pop()?;
+
+                    let result = match (&a, &b) {
+                        (Value::Bool(x), Value::Bool(y)) => Value::Bool(*x && *y),
+                        _ => {
+                            return Err(VmError::TypeMismatch {
+                                operation: String::from("and"),
+                                left: a,
+                                right: b,
+                                ip: self.ip,
+                            });
+                        }
+                    };
+
+                    self.stack.push(result);
+                }
+                Instruction::Or => {
+                    let b = self.pop()?;
+                    let a = self.pop()?;
+
+                    let result = match (&a, &b) {
+                        (Value::Bool(x), Value::Bool(y)) => Value::Bool(*x || *y),
+                        _ => {
+                            return Err(VmError::TypeMismatch {
+                                operation: String::from("or"),
+                                left: a,
+                                right: b,
+                                ip: self.ip,
+                            });
+                        }
+                    };
+
+                    self.stack.push(result);
+                }
+                Instruction::Not => {
+                    let value = self.pop()?;
+
+                    let result = match value {
+                        Value::Bool(x) => Value::Bool(!x),
+                        _ => {
+                            return Err(VmError::InvalidType {
+                                operation: String::from("not"),
+                                value,
+                                ip: self.ip,
+                            });
+                        }
+                    };
+
+                    self.stack.push(result);
+                }
                 Instruction::Exit => {
                     break;
                 }
