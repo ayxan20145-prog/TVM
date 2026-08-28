@@ -4,6 +4,8 @@ mod parser;
 mod value;
 mod vm;
 
+const VERSION: &str = env!("CARGO_PKG_VERSION");
+
 use std::{env, fs};
 
 fn main() {
@@ -14,6 +16,10 @@ fn main() {
         return;
     }
 
+    if args[1] == "--version" {
+        println!("Terbium {}", VERSION);
+        return;
+    }
     let mut vm = vm::VM::new();
 
     let source = fs::read_to_string(&args[1]).expect("Failed to read file");
