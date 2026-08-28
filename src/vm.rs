@@ -173,6 +173,40 @@ impl VM {
 
                     self.stack.push(result);
                 }
+                Instruction::Inc => {
+                    let value = self.pop()?;
+
+                    let result = match value {
+                        Value::Int(i) => Value::Int(i + 1),
+                        Value::Float(f) => Value::Float(f + 1.0),
+                        _ => {
+                            return Err(VmError::InvalidType {
+                                operation: String::from("inc"),
+                                value,
+                                ip: self.ip,
+                            });
+                        }
+                    };
+
+                    self.stack.push(result);
+                }
+                Instruction::Dec => {
+                    let value = self.pop()?;
+
+                    let result = match value {
+                        Value::Int(i) => Value::Int(i - 1),
+                        Value::Float(f) => Value::Float(f - 1.0),
+                        _ => {
+                            return Err(VmError::InvalidType {
+                                operation: String::from("dec"),
+                                value,
+                                ip: self.ip,
+                            });
+                        }
+                    };
+
+                    self.stack.push(result);
+                }
                 Instruction::Store(name) => {
                     let value = self.pop()?;
 

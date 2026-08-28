@@ -97,6 +97,16 @@ pub fn parse(source: &str) -> Result<Vec<Instruction>, ParseError> {
 
                 instructions.push(Instruction::Div);
             }
+            "inc" => {
+                check_args(&parts, 0, "inc", line_number)?;
+
+                instructions.push(Instruction::Inc);
+            }
+            "dec" => {
+                check_args(&parts, 0, "dec", line_number)?;
+
+                instructions.push(Instruction::Dec);
+            }
             "store" => {
                 check_args(&parts, 1, "store", line_number)?;
 

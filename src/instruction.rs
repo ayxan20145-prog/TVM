@@ -11,6 +11,8 @@ pub enum Instruction {
     Sub,
     Mul,
     Div,
+    Inc,
+    Dec,
     Store(String),
     Load(String),
     Drop(String),
