@@ -237,10 +237,9 @@ impl VM {
                     let path = match path_value {
                         Value::String(s) => s,
                         _ => {
-                            return Err(VmError::TypeMismatch {
+                            return Err(VmError::InvalidType {
                                 operation: String::from("readf"),
-                                left: path_value,
-                                right: Value::String(String::new()),
+                                value: path_value,
                                 ip: self.ip,
                             });
                         }
@@ -258,10 +257,9 @@ impl VM {
                     let content = match content_value {
                         Value::String(s) => s,
                         _ => {
-                            return Err(VmError::TypeMismatch {
-                                operation: String::from("writef"),
-                                left: content_value,
-                                right: Value::String(String::new()),
+                            return Err(VmError::InvalidType {
+                                operation: String::from("writef (content)"),
+                                value: content_value,
                                 ip: self.ip,
                             });
                         }
@@ -271,10 +269,9 @@ impl VM {
                     let path = match path_value {
                         Value::String(s) => s,
                         _ => {
-                            return Err(VmError::TypeMismatch {
-                                operation: String::from("writef"),
-                                left: path_value,
-                                right: Value::String(String::new()),
+                            return Err(VmError::InvalidType {
+                                operation: String::from("writef (path)"),
+                                value: path_value,
                                 ip: self.ip,
                             });
                         }
@@ -290,10 +287,9 @@ impl VM {
                     let path = match path_value {
                         Value::String(s) => s,
                         _ => {
-                            return Err(VmError::TypeMismatch {
+                            return Err(VmError::InvalidType {
                                 operation: String::from("removef"),
-                                left: path_value,
-                                right: Value::String(String::new()),
+                                value: path_value,
                                 ip: self.ip,
                             });
                         }
@@ -309,10 +305,9 @@ impl VM {
                     let path = match path_value {
                         Value::String(s) => s,
                         _ => {
-                            return Err(VmError::TypeMismatch {
+                            return Err(VmError::InvalidType {
                                 operation: String::from("createdir"),
-                                left: path_value,
-                                right: Value::String(String::new()),
+                                value: path_value,
                                 ip: self.ip,
                             });
                         }
@@ -328,10 +323,9 @@ impl VM {
                     let path = match path_value {
                         Value::String(s) => s,
                         _ => {
-                            return Err(VmError::TypeMismatch {
+                            return Err(VmError::InvalidType {
                                 operation: String::from("removedir"),
-                                left: path_value,
-                                right: Value::String(String::new()),
+                                value: path_value,
                                 ip: self.ip,
                             });
                         }
@@ -358,10 +352,9 @@ impl VM {
                             self.stack.push(Value::Int(i));
                         }
                         other => {
-                            return Err(VmError::TypeMismatch {
+                            return Err(VmError::InvalidType {
                                 operation: String::from("stoi"),
-                                left: other,
-                                right: Value::String(String::new()),
+                                value: other,
                                 ip: self.ip,
                             });
                         }
@@ -384,10 +377,9 @@ impl VM {
                             self.stack.push(Value::Float(f));
                         }
                         other => {
-                            return Err(VmError::TypeMismatch {
+                            return Err(VmError::InvalidType {
                                 operation: String::from("stof"),
-                                left: other,
-                                right: Value::String(String::new()),
+                                value: other,
                                 ip: self.ip,
                             });
                         }
@@ -410,10 +402,9 @@ impl VM {
                             self.stack.push(Value::Bool(b));
                         }
                         other => {
-                            return Err(VmError::TypeMismatch {
+                            return Err(VmError::InvalidType {
                                 operation: String::from("stob"),
-                                left: other,
-                                right: Value::String(String::new()),
+                                value: other,
                                 ip: self.ip,
                             });
                         }
@@ -427,10 +418,9 @@ impl VM {
                             self.stack.push(Value::Float(i as f64));
                         }
                         other => {
-                            return Err(VmError::TypeMismatch {
+                            return Err(VmError::InvalidType {
                                 operation: String::from("itof"),
-                                left: other,
-                                right: Value::String(String::new()),
+                                value: other,
                                 ip: self.ip,
                             });
                         }
@@ -442,10 +432,9 @@ impl VM {
                     match value {
                         Value::Int(i) => self.stack.push(Value::String(i.to_string())),
                         other => {
-                            return Err(VmError::TypeMismatch {
+                            return Err(VmError::InvalidType {
                                 operation: String::from("itos"),
-                                left: other,
-                                right: Value::String(String::new()),
+                                value: other,
                                 ip: self.ip,
                             });
                         }
@@ -464,10 +453,9 @@ impl VM {
                             self.stack.push(Value::Bool(b));
                         }
                         other => {
-                            return Err(VmError::TypeMismatch {
+                            return Err(VmError::InvalidType {
                                 operation: String::from("itob"),
-                                left: other,
-                                right: Value::String(String::new()),
+                                value: other,
                                 ip: self.ip,
                             });
                         }
@@ -481,10 +469,9 @@ impl VM {
                             self.stack.push(Value::Int(f as i32));
                         }
                         other => {
-                            return Err(VmError::TypeMismatch {
+                            return Err(VmError::InvalidType {
                                 operation: String::from("ftoi"),
-                                left: other,
-                                right: Value::String(String::new()),
+                                value: other,
                                 ip: self.ip,
                             });
                         }
@@ -496,10 +483,9 @@ impl VM {
                     match value {
                         Value::Float(f) => self.stack.push(Value::String(f.to_string())),
                         other => {
-                            return Err(VmError::TypeMismatch {
+                            return Err(VmError::InvalidType {
                                 operation: String::from("ftos"),
-                                left: other,
-                                right: Value::String(String::new()),
+                                value: other,
                                 ip: self.ip,
                             });
                         }
@@ -518,10 +504,9 @@ impl VM {
                             self.stack.push(Value::Bool(b));
                         }
                         other => {
-                            return Err(VmError::TypeMismatch {
+                            return Err(VmError::InvalidType {
                                 operation: String::from("ftob"),
-                                left: other,
-                                right: Value::String(String::new()),
+                                value: other,
                                 ip: self.ip,
                             });
                         }
@@ -533,10 +518,9 @@ impl VM {
                     match value {
                         Value::Bool(b) => self.stack.push(Value::Int(b as i32)),
                         other => {
-                            return Err(VmError::TypeMismatch {
+                            return Err(VmError::InvalidType {
                                 operation: String::from("btoi"),
-                                left: other,
-                                right: Value::String(String::new()),
+                                value: other,
                                 ip: self.ip,
                             });
                         }
@@ -548,10 +532,9 @@ impl VM {
                     match value {
                         Value::Bool(b) => self.stack.push(Value::Float(f64::from(b))),
                         other => {
-                            return Err(VmError::TypeMismatch {
+                            return Err(VmError::InvalidType {
                                 operation: String::from("btof"),
-                                left: other,
-                                right: Value::String(String::new()),
+                                value: other,
                                 ip: self.ip,
                             });
                         }
@@ -563,10 +546,9 @@ impl VM {
                     match value {
                         Value::Bool(b) => self.stack.push(Value::String(b.to_string())),
                         other => {
-                            return Err(VmError::TypeMismatch {
+                            return Err(VmError::InvalidType {
                                 operation: String::from("btos"),
-                                left: other,
-                                right: Value::String(String::new()),
+                                value: other,
                                 ip: self.ip,
                             });
                         }

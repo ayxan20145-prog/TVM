@@ -1,9 +1,19 @@
 # Reading, Writing and Removing files
 #
-writef hi.txt hi # Write file "hi.txt" with the content "hi"
-readf hi.txt # Read file "hi.txt" and push to stack
+pushstr hi.txt # Push hi.txt string to stack
+pushstr hi # Push hi string to stack
+writef # Write file "hi.txt" with the content "hi"
+
+pushstr hi.txt # Push hi.txt string to stack
+readf # Read file "hi.txt" and push to stack
 print # Print last value in stack
 println # Print a new line
-removef hi.txt # Remove file "hi.txt"
-createdir hi # Create directory "hi"
-removedir hi # Remove directory "hi"
+
+pushstr hi.txt # Push hi.txt string to stack
+removef # Remove file "hi.txt"
+
+pushstr hi # Push hi string to stack
+createdir # Create directory "hi"
+
+pushstr hi # Push hi string to stack
+removedir # Remove directory "hi"

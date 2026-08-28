@@ -27,6 +27,11 @@ pub enum VmError {
         to: String,
         ip: usize,
     },
+    InvalidType {
+        operation: String,
+        value: Value,
+        ip: usize,
+    },
 }
 
 pub enum ParseError {
@@ -73,6 +78,17 @@ impl fmt::Display for VmError {
                     f,
                     "conversion error at instruction {}: cannot convert {} to {}",
                     ip, from, to
+                )
+            }
+            VmError::InvalidType {
+                operation,
+                value,
+                ip,
+            } => {
+                write!(
+                    f,
+                    "invalid type at {}: cannot do '{}' to {}",
+                    ip, operation, value
                 )
             }
         }
