@@ -179,43 +179,29 @@ pub fn parse(source: &str) -> Result<Vec<Instruction>, ParseError> {
                 instructions.push(Instruction::JumpIf(value, address));
             }
             "readf" => {
-                check_args(&parts, 1, "readf", line_number)?;
+                check_args(&parts, 0, "readf", line_number)?;
 
-                let path = parts[1];
-
-                instructions.push(Instruction::ReadF(String::from(path)));
+                instructions.push(Instruction::ReadF);
             }
             "writef" => {
-                check_args(&parts, 2, "writef", line_number)?;
+                check_args(&parts, 0, "writef", line_number)?;
 
-                let path = parts[1];
-                let content = parts[2];
-
-                instructions.push(Instruction::WriteF(
-                    String::from(path),
-                    String::from(content),
-                ));
+                instructions.push(Instruction::WriteF);
             }
             "removef" => {
-                check_args(&parts, 1, "removef", line_number)?;
+                check_args(&parts, 0, "removef", line_number)?;
 
-                let path = parts[1];
-
-                instructions.push(Instruction::RemoveF(String::from(path)));
+                instructions.push(Instruction::RemoveF);
             }
             "createdir" => {
-                check_args(&parts, 1, "createdir", line_number)?;
+                check_args(&parts, 0, "createdir", line_number)?;
 
-                let path = parts[1];
-
-                instructions.push(Instruction::CreateDir(String::from(path)));
+                instructions.push(Instruction::CreateDir);
             }
             "removedir" => {
-                check_args(&parts, 1, "removedir", line_number)?;
+                check_args(&parts, 0, "removedir", line_number)?;
 
-                let path = parts[1];
-
-                instructions.push(Instruction::RemoveDir(String::from(path)));
+                instructions.push(Instruction::RemoveDir);
             }
             "stoi" => {
                 check_args(&parts, 0, "stoi", line_number)?;

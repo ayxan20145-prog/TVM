@@ -232,34 +232,111 @@ impl VM {
                         continue;
                     }
                 }
-                Instruction::ReadF(path) => {
-                    let content = fs::read_to_string(path).map_err(|_| VmError::InvalidPath {
+                Instruction::ReadF => {
+                    let path_value = self.pop()?;
+                    let path = match path_value {
+                        Value::String(s) => s,
+                        _ => {
+                            return Err(VmError::TypeMismatch {
+                                operation: String::from("readf"),
+                                left: path_value,
+                                right: Value::String(String::new()),
+                                ip: self.ip,
+                            });
+                        }
+                    };
+
+                    let content = fs::read_to_string(&path).map_err(|_| VmError::InvalidPath {
                         path: String::from(path),
                         ip: self.ip,
                     })?;
 
                     self.stack.push(Value::String(content));
                 }
-                Instruction::WriteF(path, content) => {
-                    fs::write(path, content).map_err(|_| VmError::InvalidPath {
+                Instruction::WriteF => {
+                    let content_value = self.pop()?;
+                    let content = match content_value {
+                        Value::String(s) => s,
+                        _ => {
+                            return Err(VmError::TypeMismatch {
+                                operation: String::from("writef"),
+                                left: content_value,
+                                right: Value::String(String::new()),
+                                ip: self.ip,
+                            });
+                        }
+                    };
+
+                    let path_value = self.pop()?;
+                    let path = match path_value {
+                        Value::String(s) => s,
+                        _ => {
+                            return Err(VmError::TypeMismatch {
+                                operation: String::from("writef"),
+                                left: path_value,
+                                right: Value::String(String::new()),
+                                ip: self.ip,
+                            });
+                        }
+                    };
+
+                    fs::write(&path, content).map_err(|_| VmError::InvalidPath {
                         path: String::from(path),
                         ip: self.ip,
                     })?;
                 }
-                Instruction::RemoveF(path) => {
-                    fs::remove_file(path).map_err(|_| VmError::InvalidPath {
+                Instruction::RemoveF => {
+                    let path_value = self.pop()?;
+                    let path = match path_value {
+                        Value::String(s) => s,
+                        _ => {
+                            return Err(VmError::TypeMismatch {
+                                operation: String::from("removef"),
+                                left: path_value,
+                                right: Value::String(String::new()),
+                                ip: self.ip,
+                            });
+                        }
+                    };
+
+                    fs::remove_file(&path).map_err(|_| VmError::InvalidPath {
                         path: String::from(path),
                         ip: self.ip,
                     })?;
                 }
-                Instruction::CreateDir(path) => {
-                    fs::create_dir(path).map_err(|_| VmError::InvalidPath {
+                Instruction::CreateDir => {
+                    let path_value = self.pop()?;
+                    let path = match path_value {
+                        Value::String(s) => s,
+                        _ => {
+                            return Err(VmError::TypeMismatch {
+                                operation: String::from("createdir"),
+                                left: path_value,
+                                right: Value::String(String::new()),
+                                ip: self.ip,
+                            });
+                        }
+                    };
+
+                    fs::create_dir(&path).map_err(|_| VmError::InvalidPath {
                         path: String::from(path),
                         ip: self.ip,
                     })?;
                 }
-                Instruction::RemoveDir(path) => {
-                    fs::remove_dir(path).map_err(|_| VmError::InvalidPath {
+                Instruction::RemoveDir => {
+                    let path_value = self.pop()?;
+                    let path = match path_value {
+                        Value::String(s) => s,
+                        _ => {
+                            return Err(VmError::TypeMismatch {
+                                operation: String::from("removedir"),
+                                left: path_value,
+                                right: Value::String(String::new()),
+                                ip: self.ip,
+                            });
+                        }
+                    };
+                    fs::remove_dir(&path).map_err(|_| VmError::InvalidPath {
                         path: String::from(path),
                         ip: self.ip,
                     })?;
