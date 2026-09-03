@@ -47,9 +47,16 @@ pub fn parse(source: &str) -> Result<Vec<Instruction>, ParseError> {
                 instructions.push(Instruction::Push(value));
             }
             "pushstr" => {
-                check_args(&parts, 1, "pushstr", line_number)?;
+                let str = line.splitn(2, ' ').nth(1).unwrap_or("");
 
-                instructions.push(Instruction::PushStr(parts[1].to_string()));
+                if str.is_empty() {
+                    return Err(ParseError::MissingArgument {
+                        instruction: String::from("pushstr"),
+                        line: line_number,
+                    });
+                }
+
+                instructions.push(Instruction::PushStr(str.to_string()));
             }
             "pushspace" => {
                 check_args(&parts, 0, "pushspace", line_number)?;
