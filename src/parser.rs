@@ -56,7 +56,7 @@ pub fn parse(source: &str) -> Result<Vec<Instruction>, ParseError> {
                     });
                 }
 
-                instructions.push(Instruction::PushStr(str.to_string()));
+                instructions.push(Instruction::PushStr(str.to_string().replace("\\n", "\n")));
             }
             "pushspace" => {
                 check_args(&parts, 0, "pushspace", line_number)?;
