@@ -4,17 +4,20 @@ a stack-based bytecode interpreter written in rust
 ---
 
 ## Install
+
+Requirements:
+- `rust`
+- `cargo make`
+
 ```bash
 git clone https://github.com/ayxan20145-prog/TVM.git
 cd TVM
-chmod +x scripts/install.sh
-./scripts/install.sh
+cargo make install
 ```
 
 ## Uninstall
 ```bash
-chmod +x scripts/uninstall.sh
-./scripts/uninstall.sh
+cargo make uninstall
 ```
 
 ## Run a program

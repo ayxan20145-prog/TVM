@@ -1,0 +1,15 @@
+[tasks.default]
+alias = "install"
+
+[tasks.install]
+description = "install Terbium VM"
+script = [
+    "cargo build --release",
+    "sudo install -Dm755 target/release/terb /usr/local/bin"
+]
+
+[tasks.uninstall]
+description = "uninstall Terbium VM"
+script = [
+    "sudo rm -f /usr/local/bin/terb"
+]

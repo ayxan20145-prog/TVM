@@ -4,25 +4,21 @@ mod parser;
 mod value;
 mod vm;
 
-const VERSION: &str = env!("CARGO_PKG_VERSION");
+use clap::Parser;
+use std::fs;
 
-use std::{env, fs};
+#[derive(Parser, Debug)]
+#[command(name = "terb", version, about = "Terbium VM")]
+struct Cli {
+    input: String,
+}
 
 fn main() {
-    let args: Vec<String> = env::args().collect();
+    let args = Cli::parse();
 
-    if args.len() < 2 {
-        println!("usage: terb PATH");
-        return;
-    }
-
-    if args[1] == "--version" {
-        println!("Terbium {}", VERSION);
-        return;
-    }
     let mut vm = vm::VM::new();
 
-    let source = fs::read_to_string(&args[1]).expect("Failed to read file");
+    let source = fs::read_to_string(&args.input).expect("Failed to read file");
 
     let instructions = match parser::parse(&source) {
         Ok(instructions) => instructions,
