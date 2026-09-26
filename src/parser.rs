@@ -1,4 +1,8 @@
-use crate::{error::ParseError, instruction::Instruction, value::Value};
+use crate::{
+    error::ParseError,
+    instruction::{Instruction, JumpTarget},
+    value::Value,
+};
 
 pub fn parse(source: &str) -> Result<Vec<Instruction>, ParseError> {
     let mut instructions: Vec<Instruction> = Vec::new();
@@ -186,14 +190,13 @@ pub fn parse(source: &str) -> Result<Vec<Instruction>, ParseError> {
                     }
                 };
 
-                let address = parts[2]
-                    .parse::<usize>()
-                    .map_err(|_| ParseError::InvalidNumber {
-                        value: String::from(parts[2]),
-                        line: line_number,
-                    })?;
+                let target = if let Ok(address) = parts[2].parse::<usize>() {
+                    JumpTarget::Address(address)
+                } else {
+                    JumpTarget::Label(parts[2].to_string())
+                };
 
-                instructions.push(Instruction::JumpIf(value, address));
+                instructions.push(Instruction::JumpIf(value, target));
             }
             "readf" => {
                 check_args(&parts, 0, "readf", line_number)?;

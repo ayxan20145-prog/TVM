@@ -1,4 +1,8 @@
-use crate::{error::VmError, instruction::Instruction, value::Value};
+use crate::{
+    error::VmError,
+    instruction::{Instruction, JumpTarget},
+    value::Value,
+};
 use std::{collections::HashMap, fs, io};
 
 pub struct VM {
@@ -259,7 +263,20 @@ impl VM {
 
                     self.stack.push(Value::String(input.trim().to_string()));
                 }
-                Instruction::JumpIf(value, address) => {
+                Instruction::JumpIf(value, target) => {
+                    let address = match target {
+                        JumpTarget::Address(addr) => *addr,
+                        JumpTarget::Label(name) => {
+                            *self
+                                .labels
+                                .get(name)
+                                .ok_or_else(|| VmError::UndefinedLable {
+                                    name: name.clone(),
+                                    ip: self.ip,
+                                })?
+                        }
+                    };
+
                     let top = self
                         .stack
                         .last()
@@ -274,7 +291,7 @@ impl VM {
                     };
 
                     if equal {
-                        self.ip = *address;
+                        self.ip = address;
                         continue;
                     }
                 }

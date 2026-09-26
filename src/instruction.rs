@@ -21,7 +21,7 @@ pub enum Instruction {
     Println,
     Debug,
     Read,
-    JumpIf(Value, usize),
+    JumpIf(Value, JumpTarget),
     ReadF,
     WriteF,
     RemoveF,
@@ -53,4 +53,9 @@ pub enum Instruction {
     Ret,
     DropLabel(String),
     Exit,
+}
+
+pub enum JumpTarget {
+    Address(usize),
+    Label(String),
 }
