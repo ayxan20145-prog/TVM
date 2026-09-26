@@ -325,6 +325,21 @@ pub fn parse(source: &str) -> Result<Vec<Instruction>, ParseError> {
 
                 instructions.push(Instruction::Not);
             }
+            "label" => {
+                check_args(&parts, 1, "label", line_number)?;
+
+                instructions.push(Instruction::Label(parts[1].to_string()));
+            }
+            "call" => {
+                check_args(&parts, 1, "call", line_number)?;
+
+                instructions.push(Instruction::Call(parts[1].to_string()));
+            }
+            "ret" => {
+                check_args(&parts, 0, "ret", line_number)?;
+
+                instructions.push(Instruction::Ret);
+            }
             "exit" => {
                 check_args(&parts, 0, "exit", line_number)?;
 

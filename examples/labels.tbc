@@ -1,0 +1,8 @@
+push 5
+call print_num
+exit
+
+label print_num
+print
+println
+ret

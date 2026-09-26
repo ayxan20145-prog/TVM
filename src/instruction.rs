@@ -48,5 +48,8 @@ pub enum Instruction {
     And,
     Or,
     Not,
+    Label(String),
+    Call(String),
+    Ret,
     Exit,
 }

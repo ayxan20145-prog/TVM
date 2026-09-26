@@ -5,6 +5,8 @@ pub struct VM {
     stack: Vec<Value>,
     variables: HashMap<String, Value>,
     ip: usize,
+    call_stack: Vec<usize>,
+    labels: HashMap<String, usize>,
 }
 
 impl VM {
@@ -13,6 +15,8 @@ impl VM {
             stack: Vec::new(),
             variables: HashMap::new(),
             ip: 0,
+            call_stack: Vec::new(),
+            labels: HashMap::new(),
         }
     }
     fn pop(&mut self) -> Result<Value, VmError> {
@@ -21,6 +25,14 @@ impl VM {
             .ok_or(VmError::StackUnderflow { ip: self.ip })
     }
     pub fn execute(&mut self, instructions: &[Instruction]) -> Result<(), VmError> {
+        self.labels.clear();
+
+        for (i, idk) in instructions.iter().enumerate() {
+            if let Instruction::Label(name) = idk {
+                self.labels.insert(name.clone(), i);
+            }
+        }
+
         while self.ip < instructions.len() {
             match &instructions[self.ip] {
                 Instruction::Push(value) => {
@@ -773,6 +785,29 @@ impl VM {
                     };
 
                     self.stack.push(result);
+                }
+                Instruction::Label(_) => {}
+                Instruction::Call(name) => {
+                    let target = *self
+                        .labels
+                        .get(name)
+                        .ok_or_else(|| VmError::UndefinedLable {
+                            name: name.clone(),
+                            ip: self.ip,
+                        })?;
+
+                    self.call_stack.push(self.ip + 1);
+                    self.ip = target;
+                    continue;
+                }
+                Instruction::Ret => {
+                    let return_addr = self
+                        .call_stack
+                        .pop()
+                        .ok_or(VmError::CallStackUnderflow { ip: self.ip })?;
+
+                    self.ip = return_addr;
+                    continue;
                 }
                 Instruction::Exit => {
                     break;

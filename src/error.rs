@@ -32,6 +32,13 @@ pub enum VmError {
         value: Value,
         ip: usize,
     },
+    UndefinedLable {
+        name: String,
+        ip: usize,
+    },
+    CallStackUnderflow {
+        ip: usize,
+    },
 }
 
 pub enum ParseError {
@@ -90,6 +97,12 @@ impl fmt::Display for VmError {
                     "invalid type at {}: cannot do '{}' to {}",
                     ip, operation, value
                 )
+            }
+            VmError::UndefinedLable { name, ip } => {
+                write!(f, "undefined lable at instruction {}: {}", ip, name)
+            }
+            VmError::CallStackUnderflow { ip } => {
+                write!(f, "call stack underflow at instruction {}", ip)
             }
         }
     }
