@@ -136,17 +136,13 @@ pub fn parse(source: &str) -> Result<Vec<Instruction>, ParseError> {
             "jump" => {
                 check_args(&parts, 1, "jump", line_number)?;
 
-                let address = match parts[1].parse::<usize>() {
-                    Ok(address) => address,
-                    Err(_) => {
-                        return Err(ParseError::InvalidNumber {
-                            value: String::from(parts[1]),
-                            line: line_number,
-                        });
-                    }
+                let target = if let Ok(address) = parts[1].parse::<usize>() {
+                    JumpTarget::Address(address)
+                } else {
+                    JumpTarget::Label(parts[1].to_string())
                 };
 
-                instructions.push(Instruction::Jump(address));
+                instructions.push(Instruction::Jump(target));
             }
             "print" => {
                 check_args(&parts, 0, "print", line_number)?;

@@ -242,8 +242,21 @@ impl VM {
                 Instruction::Drop(name) => {
                     self.variables.remove(name);
                 }
-                Instruction::Jump(address) => {
-                    self.ip = *address;
+                Instruction::Jump(target) => {
+                    let address = match target {
+                        JumpTarget::Address(addr) => *addr,
+                        JumpTarget::Label(name) => {
+                            *self
+                                .labels
+                                .get(name)
+                                .ok_or_else(|| VmError::UndefinedLable {
+                                    name: name.clone(),
+                                    ip: self.ip,
+                                })?
+                        }
+                    };
+
+                    self.ip = address;
                     continue;
                 }
                 Instruction::Print => {

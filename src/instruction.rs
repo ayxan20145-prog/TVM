@@ -16,7 +16,7 @@ pub enum Instruction {
     Store(String),
     Load(String),
     Drop(String),
-    Jump(usize),
+    Jump(JumpTarget),
     Print,
     Println,
     Debug,
