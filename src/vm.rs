@@ -809,6 +809,9 @@ impl VM {
                     self.ip = return_addr;
                     continue;
                 }
+                Instruction::DropLabel(name) => {
+                    self.labels.remove(name);
+                }
                 Instruction::Exit => {
                     break;
                 }

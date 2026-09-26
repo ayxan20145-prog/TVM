@@ -1,5 +1,10 @@
 push 5
 call print_num
+push 2
+call print_num
+droplabel print_num
+push 4
+call print_num # Gives an error
 exit
 
 label print_num

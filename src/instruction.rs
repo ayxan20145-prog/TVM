@@ -51,5 +51,6 @@ pub enum Instruction {
     Label(String),
     Call(String),
     Ret,
+    DropLabel(String),
     Exit,
 }
