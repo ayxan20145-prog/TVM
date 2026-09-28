@@ -389,8 +389,8 @@ impl VM {
                         }
                     };
 
-                    fs::create_dir(&path).map_err(|_| VmError::InvalidPath {
-                        path: String::from(path),
+                    fs::create_dir_all(&path).map_err(|_| VmError::InvalidPath {
+                        path: format!("{}", path),
                         ip: self.ip,
                     })?;
                 }
@@ -406,7 +406,7 @@ impl VM {
                             });
                         }
                     };
-                    fs::remove_dir(&path).map_err(|_| VmError::InvalidPath {
+                    fs::remove_dir_all(&path).map_err(|_| VmError::InvalidPath {
                         path: String::from(path),
                         ip: self.ip,
                     })?;
