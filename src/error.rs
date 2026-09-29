@@ -39,6 +39,11 @@ pub enum VmError {
     CallStackUnderflow {
         ip: usize,
     },
+    CommandError {
+        command: String,
+        message: String,
+        ip: usize,
+    },
 }
 
 pub enum ParseError {
@@ -103,6 +108,17 @@ impl fmt::Display for VmError {
             }
             VmError::CallStackUnderflow { ip } => {
                 write!(f, "call stack underflow at instruction {}", ip)
+            }
+            VmError::CommandError {
+                command,
+                message,
+                ip,
+            } => {
+                write!(
+                    f,
+                    "command error at instruction {}: {} [{}]",
+                    ip, command, message
+                )
             }
         }
     }

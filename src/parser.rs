@@ -344,6 +344,11 @@ pub fn parse(source: &str) -> Result<Vec<Instruction>, ParseError> {
 
                 instructions.push(Instruction::DropLabel(parts[1].to_string()));
             }
+            "sh" => {
+                check_args(&parts, 0, "sh", line_number)?;
+
+                instructions.push(Instruction::Sh);
+            }
             "exit" => {
                 check_args(&parts, 0, "exit", line_number)?;
 

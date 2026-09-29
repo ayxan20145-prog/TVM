@@ -3,7 +3,7 @@ use crate::{
     instruction::{Instruction, JumpTarget},
     value::Value,
 };
-use std::{collections::HashMap, fs, io};
+use std::{collections::HashMap, fs, io, process::Command};
 
 pub struct VM {
     stack: Vec<Value>,
@@ -841,6 +841,33 @@ impl VM {
                 }
                 Instruction::DropLabel(name) => {
                     self.labels.remove(name);
+                }
+                Instruction::Sh => {
+                    let cmd_value = self.pop()?;
+                    let cmd = match cmd_value {
+                        Value::String(s) => s,
+                        _ => {
+                            return Err(VmError::InvalidType {
+                                operation: String::from("sh"),
+                                value: cmd_value,
+                                ip: self.ip,
+                            });
+                        }
+                    };
+
+                    let smth = Command::new("sh")
+                        .arg("-c")
+                        .arg(&cmd)
+                        .output()
+                        .map_err(|e| VmError::CommandError {
+                            command: cmd.clone(),
+                            message: e.to_string(),
+                            ip: self.ip,
+                        })?;
+
+                    self.stack.push(Value::String(
+                        String::from_utf8_lossy(&smth.stdout).into_owned(),
+                    ));
                 }
                 Instruction::Exit => {
                     break;
