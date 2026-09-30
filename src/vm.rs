@@ -865,6 +865,48 @@ impl VM {
                             ip: self.ip,
                         })?;
                 }
+                Instruction::StrLen => {
+                    let str_value = self.pop()?;
+                    let str = match str_value {
+                        Value::String(s) => s,
+                        _ => {
+                            return Err(VmError::InvalidType {
+                                operation: String::from("strlen"),
+                                value: str_value,
+                                ip: self.ip,
+                            });
+                        }
+                    };
+
+                    self.stack.push(Value::Int(str.len() as i32));
+                }
+                Instruction::StrConcat => {
+                    let str2_value = self.pop()?;
+                    let str2 = match str2_value {
+                        Value::String(s) => s,
+                        _ => {
+                            return Err(VmError::InvalidType {
+                                operation: String::from("strconcat"),
+                                value: str2_value,
+                                ip: self.ip,
+                            });
+                        }
+                    };
+
+                    let str1_value = self.pop()?;
+                    let str1 = match str1_value {
+                        Value::String(s) => s,
+                        _ => {
+                            return Err(VmError::InvalidType {
+                                operation: String::from("strconcat"),
+                                value: str1_value,
+                                ip: self.ip,
+                            });
+                        }
+                    };
+
+                    self.stack.push(Value::String(format!("{}{}", str1, str2)));
+                }
                 Instruction::Exit => {
                     break;
                 }

@@ -349,6 +349,16 @@ pub fn parse(source: &str) -> Result<Vec<Instruction>, ParseError> {
 
                 instructions.push(Instruction::Sh);
             }
+            "strlen" => {
+                check_args(&parts, 0, "strlen", line_number)?;
+
+                instructions.push(Instruction::StrLen);
+            }
+            "strconcat" => {
+                check_args(&parts, 0, "strconcat", line_number)?;
+
+                instructions.push(Instruction::StrConcat);
+            }
             "exit" => {
                 check_args(&parts, 0, "exit", line_number)?;
 

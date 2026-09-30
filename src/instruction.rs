@@ -53,6 +53,8 @@ pub enum Instruction {
     Ret,
     DropLabel(String),
     Sh,
+    StrLen,
+    StrConcat,
     Exit,
 }
 
