@@ -159,6 +159,16 @@ pub fn parse(source: &str) -> Result<Vec<Instruction>, ParseError> {
 
                 instructions.push(Instruction::Debug);
             }
+            "debugvars" => {
+                check_args(&parts, 0, "debugvars", line_number)?;
+
+                instructions.push(Instruction::Debugvars);
+            }
+            "debuglabels" => {
+                check_args(&parts, 0, "debuglabels", line_number)?;
+
+                instructions.push(Instruction::Debuglabels);
+            }
             "read" => {
                 check_args(&parts, 0, "read", line_number)?;
 

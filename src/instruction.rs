@@ -20,6 +20,8 @@ pub enum Instruction {
     Print,
     Println,
     Debug,
+    Debugvars,
+    Debuglabels,
     Read,
     JumpIf(Value, JumpTarget),
     ReadF,

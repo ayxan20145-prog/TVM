@@ -268,6 +268,12 @@ impl VM {
                 Instruction::Debug => {
                     print!("{:?}", self.stack);
                 }
+                Instruction::Debugvars => {
+                    print!("{:?}", self.variables);
+                }
+                Instruction::Debuglabels => {
+                    print!("{:?}", self.labels);
+                }
                 Instruction::Read => {
                     let mut input = String::new();
                     io::stdin()
