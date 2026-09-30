@@ -855,19 +855,15 @@ impl VM {
                         }
                     };
 
-                    let smth = Command::new("sh")
+                    Command::new("sh")
                         .arg("-c")
                         .arg(&cmd)
-                        .output()
+                        .spawn()
                         .map_err(|e| VmError::CommandError {
-                            command: cmd.clone(),
+                            command: String::from(cmd),
                             message: e.to_string(),
                             ip: self.ip,
                         })?;
-
-                    self.stack.push(Value::String(
-                        String::from_utf8_lossy(&smth.stdout).into_owned(),
-                    ));
                 }
                 Instruction::Exit => {
                     break;
