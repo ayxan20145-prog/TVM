@@ -3,7 +3,12 @@ use crate::{
     instruction::{Instruction, JumpTarget},
     value::Value,
 };
-use std::{collections::HashMap, fs, io, process::Command};
+use std::{
+    collections::HashMap,
+    fs,
+    io::{self, Write},
+    process::Command,
+};
 
 pub struct VM {
     stack: Vec<Value>,
@@ -261,6 +266,7 @@ impl VM {
                 }
                 Instruction::Print => {
                     print!("{}", self.pop()?);
+                    io::stdout().flush().unwrap();
                 }
                 Instruction::Println => {
                     println!();
